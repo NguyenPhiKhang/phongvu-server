@@ -28,10 +28,10 @@ public class CategoryController implements ICategoryController {
         return categoryService.findCategoriesLevel1();
     }
 
-    @Override
-    public String autoCreatePath() {
-        return null;
-    }
+//    @Override
+//    public String autoCreatePath() {
+//        return null;
+//    }
 
     @Override
     public String autoAddIconCategories(int idCategory) {

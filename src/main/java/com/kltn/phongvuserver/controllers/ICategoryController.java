@@ -18,8 +18,8 @@ public interface ICategoryController {
 //    @GetMapping("/recommend-search")
 //    ResponseEntity<Set<String>> getRecommendSearch(@RequestParam("keyword") String keyword);
 
-    @PutMapping("/categories/create-path")
-    String autoCreatePath();
+//    @PutMapping("/categories/create-path")
+//    String autoCreatePath();
 
     @PostMapping("/categories/auto-add-icon")
     String autoAddIconCategories(@RequestParam("id") int idCategory);
