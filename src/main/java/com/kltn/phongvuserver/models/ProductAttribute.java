@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "product_attribute")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class ProductAttribute {
+public class ProductAttribute implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

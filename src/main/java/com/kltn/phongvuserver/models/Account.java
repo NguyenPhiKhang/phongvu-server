@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name="accounts")
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Account {
+public class Account implements Serializable {
     @Id
     @Column(name="username", nullable = false)
     private String username;

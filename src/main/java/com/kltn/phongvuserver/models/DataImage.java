@@ -39,6 +39,10 @@ public class DataImage implements Serializable {
     @JsonIgnore
     private Set<Product> products = new HashSet<>();
 
+    @ManyToMany(targetEntity = Rating.class, mappedBy = "dataImages", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Rating> ratings = new HashSet<>();
+
     public DataImage(String id, String name, String type, byte[] data) {
         this.id = id;
         this.name = name;

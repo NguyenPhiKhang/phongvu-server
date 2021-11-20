@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -16,7 +19,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class User {
+public class User implements Serializable {
     @Id
     private int id;
 
@@ -44,6 +47,10 @@ public class User {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Account account;
+
+    @OneToMany(targetEntity = Rating.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Rating> ratings = new HashSet<>();
 
 //    @OneToOne(fetch = FetchType.LAZY,
 //            cascade =  CascadeType.ALL,

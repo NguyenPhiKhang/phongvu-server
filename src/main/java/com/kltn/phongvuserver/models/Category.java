@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Category implements Serializable, Cloneable{
+public class Category implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
