@@ -18,6 +18,9 @@ public class RatingDTOMapper implements RowMapper<RatingDTO, Rating> {
     @Autowired
     private EnvUtil envUtil;
 
+    @Autowired
+    private FileRatingDTOMapper fileRatingDTOMapper;
+
     @Override
     public RatingDTO mapRow(Rating rating) {
         RatingDTO ratingDTO = new RatingDTO();
@@ -30,14 +33,14 @@ public class RatingDTOMapper implements RowMapper<RatingDTO, Rating> {
         try {
             ratingDTO.setImageAvatar(ImageUtil.getUrlImage(user.getImageAvatar(), envUtil.getServerUrlPrefi()));
         } catch (UnknownHostException | NullPointerException e) {
-            ratingDTO.setImageAvatar(ImageUtil.DEFAULT_PRODUCT_IMAGE_URL);
+            ratingDTO.setImageAvatar(ImageUtil.DEFAULT_USER_IMAGE_URL);
         }
 
         if (rating.isIncognito())
             ratingDTO.setUserName(StringUtil.incognitoName(user.getName()));
         else ratingDTO.setUserName(user.getName());
 
-        ratingDTO.setFileRating(rating.getDataImages().stream().map(v -> new FileRatingDTOMapper().mapRow(v)).collect(Collectors.toList()));
+        ratingDTO.setFileRating(rating.getDataImages().stream().map(v -> fileRatingDTOMapper.mapRow(v)).collect(Collectors.toList()));
 
         return ratingDTO;
     }

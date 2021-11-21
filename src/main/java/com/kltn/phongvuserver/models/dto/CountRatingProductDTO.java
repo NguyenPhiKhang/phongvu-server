@@ -36,6 +36,14 @@ public class CountRatingProductDTO {
         this.totalStar5 = totalStar5;
     }
 
+    public CountRatingProductDTO(int totalStar1, int totalStar2, int totalStar3, int totalStar4, int totalStar5) {
+        this.totalStar1 = totalStar1;
+        this.totalStar2 = totalStar2;
+        this.totalStar3 = totalStar3;
+        this.totalStar4 = totalStar4;
+        this.totalStar5 = totalStar5;
+    }
+
     public CountRatingProductDTO(int totalAll, float percentStar){
         this.totalAll = totalAll;
         this.percentStar = percentStar;

@@ -9,7 +9,7 @@ public interface IRatingService {
     void autoRating();
     CountRatingProductDTO countRatingByStarOfProduct(int productId);
     int countRatingByImageOfProduct(int productId);
-    List<Rating> getAllRatingByProductId(int productId, int page);
+    List<Rating> getRatingsByProductId(int productId, int page);
     List<Rating> getRatingByProductIdAndStar(int productId, int star, int page);
     List<Rating> getRatingByProductIdHasImage(int productId, int page);
 }

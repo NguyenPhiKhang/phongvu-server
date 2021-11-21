@@ -54,8 +54,8 @@ public class ProductService implements IProductService {
         Category category = categoryRepository.findCategoryFetchSubCategories(idCategory);
         Set<Integer> listId = new HashSet<>();
 
-        Pageable pageable = CommonUtil.getPageForNativeQueryIsTrue(page, 20);
-        int pageNew = CommonUtil.getPageForNativeQueryIsFalse(page, 20);
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(page, 20);
+        int pageNew = CommonUtil.getPageForNativeQueryIsTrue(page, 20);
 
         List<Product> products;
         if (category.getName().contains("nhu cầu") || category.getName().contains("thương hiệu")) {

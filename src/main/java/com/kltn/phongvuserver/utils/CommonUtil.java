@@ -28,11 +28,11 @@ public class CommonUtil {
         return calcRatingStarDTO;
     }
 
-    public static Pageable getPageForNativeQueryIsTrue(int page, int pageSize){
+    public static Pageable getPageForNativeQueryIsFalse(int page, int pageSize){
         return PageRequest.of(page - 1, pageSize);
     }
 
-    public static int getPageForNativeQueryIsFalse(int page, int pageSize){
+    public static int getPageForNativeQueryIsTrue(int page, int pageSize){
         return page < 1 ? 0 : (page - 1) * 20;
     }
 }
