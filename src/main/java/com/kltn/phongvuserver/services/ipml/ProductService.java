@@ -64,8 +64,13 @@ public class ProductService implements IProductService {
 
             products = productRepository.findProductsByCategoryAndBrandOrDemand(listId, demand, brand, pageNew);
         } else {
-            CategoryUtil.getListIdCategory(category.getParentCategory(), listId);
-            products =productRepository.findProductsByCategoryAndBrand(listId, brand, pageable);
+            if (category.getParentCategory() != null) {
+                CategoryUtil.getListIdCategory(category.getParentCategory(), listId);
+            } else {
+                listId.add(category.getId());
+            }
+
+            products = productRepository.findProductsByCategoryAndBrand(listId, brand, pageable);
         }
 
         return products.stream().map(p -> productItemDTOMapper.mapRow(p)).collect(Collectors.toList());
