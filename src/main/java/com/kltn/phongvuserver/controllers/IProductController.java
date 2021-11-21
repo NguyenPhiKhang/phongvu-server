@@ -1,7 +1,7 @@
 package com.kltn.phongvuserver.controllers;
 
+import com.kltn.phongvuserver.models.dto.ProductDetailDTO;
 import com.kltn.phongvuserver.models.dto.ProductItemDTO;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,4 +16,8 @@ public interface IProductController {
             @RequestParam(value = "demand", defaultValue = "0") int demand,
             @RequestParam(value = "brand", defaultValue = "0") int brand,
             @RequestParam(value = "p", defaultValue = "1") int page);
+
+
+    @GetMapping("/product/{id}")
+    ProductDetailDTO getProductById(@PathVariable int id, @RequestParam(value = "user", defaultValue = "0") int userId);
 }

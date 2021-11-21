@@ -6,6 +6,7 @@ import com.kltn.phongvuserver.models.dto.CategoryDTO;
 import com.kltn.phongvuserver.services.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
+@Transactional(rollbackFor = Throwable.class)
 public class CategoryController implements ICategoryController {
     @Autowired
     private ICategoryService categoryService;

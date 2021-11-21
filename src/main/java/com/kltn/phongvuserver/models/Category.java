@@ -26,6 +26,7 @@ public class Category implements Serializable{
     @Column(name = "icon")
     private String icon;
     @Column(name="level")
+    @JsonIgnore
     private int level;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

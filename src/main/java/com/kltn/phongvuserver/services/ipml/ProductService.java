@@ -1,13 +1,18 @@
 package com.kltn.phongvuserver.services.ipml;
 
+import com.kltn.phongvuserver.mappers.impl.ProductDetailDTOMapper;
 import com.kltn.phongvuserver.mappers.impl.ProductItemDTOMapper;
 import com.kltn.phongvuserver.models.Category;
 import com.kltn.phongvuserver.models.Product;
+import com.kltn.phongvuserver.models.dto.ProductDetailDTO;
 import com.kltn.phongvuserver.models.dto.ProductItemDTO;
 import com.kltn.phongvuserver.repositories.CategoryRepository;
 import com.kltn.phongvuserver.repositories.ProductRepository;
+import com.kltn.phongvuserver.services.IFavoriteService;
 import com.kltn.phongvuserver.services.IProductService;
+import com.kltn.phongvuserver.services.ISeenProductService;
 import com.kltn.phongvuserver.utils.CategoryUtil;
+import com.kltn.phongvuserver.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,21 +37,30 @@ public class ProductService implements IProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ISeenProductService seenProductService;
+
+    @Autowired
+    private IFavoriteService favoriteService;
+
+    @Autowired
+    private ProductItemDTOMapper productItemDTOMapper;
+
+    @Autowired
+    private ProductDetailDTOMapper productDetailDTOMapper;
+
     @Override
     public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page) {
         Category category = categoryRepository.findCategoryFetchSubCategories(idCategory);
         Set<Integer> listId = new HashSet<>();
 
-        Pageable pageable = PageRequest.of(page - 1, 20);
-        int pageNew = page < 1 ? 0 : (page - 1) * 20;
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsTrue(page, 20);
+        int pageNew = CommonUtil.getPageForNativeQueryIsFalse(page, 20);
 
-        List<ProductItemDTO> listProduct = new ArrayList<>();
         List<Product> products;
-
         if (category.getName().contains("nhu cầu") || category.getName().contains("thương hiệu")) {
             listId.add(category.getParentCategory().getId());
             CategoryUtil.getListIdCategory(category.getParentCategory(), listId);
-            List<Product> productTest = productRepository.findProductsItemByCategoryAndBrandOrDemand(listId, demand, brand, pageNew);
 
             products = productRepository.findProductsByCategoryAndBrandOrDemand(listId, demand, brand, pageNew);
         } else {
@@ -54,7 +68,25 @@ public class ProductService implements IProductService {
             products =productRepository.findProductsByCategoryAndBrand(listId, brand, pageable);
         }
 
-        listProduct.addAll(products.stream().map(p-> new ProductItemDTOMapper().mapRow(p)).collect(Collectors.toList()));
-        return listProduct;
+        return products.stream().map(p -> productItemDTOMapper.mapRow(p)).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProductDetailDTO getProductDetailById(int id, int userId) {
+        Product product = productRepository.findProductDetailById(id);
+
+        if (userId != 0) {
+            seenProductService.createOrUpdateSeenProduct(userId, product);
+            if (favoriteService.checkUserLikedProduct(userId, id)) {
+                product.setLiked(true);
+            }
+        }
+
+        return productDetailDTOMapper.mapRow(product);
+    }
+
+    @Override
+    public Product findProductByIdVisibleTrue(int id) {
+        return productRepository.findByIdAndVisibilityTrue(id);
     }
 }

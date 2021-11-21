@@ -6,10 +6,12 @@ import com.kltn.phongvuserver.services.IUserService;
 import net.andreinc.mockneat.MockNeat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = Throwable.class)
 public class UserService implements IUserService {
     @Autowired
     private UserRepository userRepository;
@@ -17,7 +19,7 @@ public class UserService implements IUserService {
 
     @Override
     public User getUserById(int userId) {
-        return null;
+        return userRepository.findUserById(userId);
     }
 
     @Override

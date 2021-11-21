@@ -52,15 +52,20 @@ public class User implements Serializable {
     @JsonIgnore
     private Set<Rating> ratings = new HashSet<>();
 
-//    @OneToOne(fetch = FetchType.LAZY,
-//            cascade =  CascadeType.ALL,
-//            mappedBy = "user")
-//    @JsonIgnore
-//    private Cart cart;
-//
-//    @OneToMany(targetEntity = Favorite.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<Favorite> favoriteProducts;
+    @OneToMany(targetEntity = Favorite.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Favorite> favorites = new HashSet<>();
+
+    @OneToMany(targetEntity = SeenProduct.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<SeenProduct> seenProducts = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade =  CascadeType.ALL,
+            mappedBy = "user")
+    @JsonIgnore
+    private Cart cart;
+
 //
 //    @OneToMany(targetEntity = Address.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JsonIgnore

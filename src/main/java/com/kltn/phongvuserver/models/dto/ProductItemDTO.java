@@ -15,9 +15,9 @@ public class ProductItemDTO {
     private int id;
     private String name;
     private boolean freeShip;
-    private BigDecimal price;
+    private BigDecimal priceOriginal;
     private float promotionPercent;
-    private BigDecimal finalPrice;
+    private BigDecimal priceFinal;
     private int orderCount;
     private String imgUrl;
     private float percentStar;

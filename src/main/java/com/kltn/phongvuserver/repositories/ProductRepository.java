@@ -15,14 +15,15 @@ import java.util.Set;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, ProductRepositoryCustom {
     boolean existsProductByIdAndVisibilityTrue(int id);
+    Product findByIdAndVisibilityTrue(int id);
 
     @Query(value = "select count(*) from demand_product where demand_id=:demandId and product_id=:productId", nativeQuery = true)
     int existsProductHaveDemand(@Param("productId") int productId, @Param("demandId") int demandId);
 
     List<Product> findProductsByVisibilityTrue();
 
-    @Query(value = "select distinct p.* from products p, categories c, demand_product dp, brands b\n" +
-            "where p.category_id = c.id and dp.product_id = p.id and p.brand_id = b.id\n" +
+    @Query(value = "select distinct p.* from products p, categories c, demand_product dp, brands b, image_product ip, data_images di\n" +
+            "where p.category_id = c.id and dp.product_id = p.id and p.brand_id = b.id and p.id = ip.product_id and di.id = ip.image_id\n" +
             "and p.category_id in (:idCategories)\n" +
             "and p.visibility = 1\n" +
             "and p.brand_id = case when :brand_id = 0 then p.brand_id else :brand_id end\n" +
@@ -38,4 +39,16 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
     List<Product> findProductsByCategoryAndBrand(@Param("idCategories") Set<Integer> idCategories,
                                                  @Param("brand_id") int brand,
                                                  Pageable pageable);
+
+    @Query("select p from Product p join fetch p.category join fetch p.dataImages where p.id=:id")
+    Product findProductByIdFetchCategoryAndDataImage(@Param("id") int id);
+
+    @Query("select p from Product p " +
+            "join fetch p.category " +
+            "left join fetch p.dataImages " +
+            "left join fetch p.brand " +
+            "join fetch p.ratingStar " +
+            "left join fetch p.productAttributes pa join fetch pa.attribute " +
+            "where p.id = :id and p.visibility=true")
+    Product findProductDetailById(@Param("id") int id);
 }

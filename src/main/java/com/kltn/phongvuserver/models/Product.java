@@ -52,7 +52,8 @@ public class Product implements Serializable {
     private Timestamp createdAt;
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
+    @Transient
+    private boolean liked;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     @JsonIgnore
@@ -76,6 +77,14 @@ public class Product implements Serializable {
     @OneToMany(targetEntity = ProductAttribute.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ProductAttribute> productAttributes = new HashSet<>();
+
+    @OneToMany(targetEntity = SeenProduct.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<SeenProduct> seenProducts = new HashSet<>();
+
+    @OneToMany(targetEntity = Favorite.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Favorite> favorites = new HashSet<>();
 
     @ManyToMany(targetEntity = DataImage.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(

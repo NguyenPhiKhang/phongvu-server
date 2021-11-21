@@ -5,6 +5,7 @@ import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.models.Rating;
 import com.kltn.phongvuserver.models.RatingStar;
 import com.kltn.phongvuserver.models.User;
+import com.kltn.phongvuserver.models.dto.CountRatingProductDTO;
 import com.kltn.phongvuserver.repositories.ProductRepository;
 import com.kltn.phongvuserver.repositories.RatingRepository;
 import com.kltn.phongvuserver.repositories.RatingStarRepository;
@@ -113,5 +114,30 @@ public class RatingService implements IRatingService {
 
             productRepository.save(pd);
         }
+    }
+
+    @Override
+    public CountRatingProductDTO countRatingByStarOfProduct(int productId) {
+        return null;
+    }
+
+    @Override
+    public int countRatingByImageOfProduct(int productId) {
+        return 0;
+    }
+
+    @Override
+    public List<Rating> getAllRatingByProductId(int productId, int page) {
+        return null;
+    }
+
+    @Override
+    public List<Rating> getRatingByProductIdAndStar(int productId, int star, int page) {
+        return null;
+    }
+
+    @Override
+    public List<Rating> getRatingByProductIdHasImage(int productId, int page) {
+        return null;
     }
 }

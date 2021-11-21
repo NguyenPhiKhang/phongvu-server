@@ -1,17 +1,24 @@
 package com.kltn.phongvuserver.mappers.impl;
 
 import com.kltn.phongvuserver.mappers.RowMapper;
+import com.kltn.phongvuserver.models.DataImage;
 import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.models.RatingStar;
+import com.kltn.phongvuserver.models.dto.CalcRatingStarDTO;
 import com.kltn.phongvuserver.models.dto.ProductItemDTO;
+import com.kltn.phongvuserver.utils.CommonUtil;
+import com.kltn.phongvuserver.utils.EnvUtil;
+import com.kltn.phongvuserver.utils.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.net.UnknownHostException;
+import java.util.Comparator;
 
+@Component
 public class ProductItemDTOMapper implements RowMapper<ProductItemDTO, Product> {
-//    @Autowired
-//    private
+    @Autowired
+    private EnvUtil envUtil;
 
     @Override
     public ProductItemDTO mapRow(Product product) {
@@ -19,23 +26,29 @@ public class ProductItemDTOMapper implements RowMapper<ProductItemDTO, Product> 
         productItemDTO.setId(product.getId());
         productItemDTO.setName(product.getName());
         productItemDTO.setFreeShip(product.isFreeShip());
-        productItemDTO.setPrice(product.getPriceOriginal());
+        productItemDTO.setPriceOriginal(product.getPriceOriginal());
         productItemDTO.setPromotionPercent(product.getPromotionPercent());
-        productItemDTO.setFinalPrice(product.getPriceOriginal().multiply(BigDecimal.valueOf(1.0 - (double) product.getPromotionPercent() / 100.0)));
+        productItemDTO.setPriceFinal(CommonUtil.calcPriceFinal(product.getPriceOriginal(), product.getPromotionPercent()));
         productItemDTO.setOrderCount(product.getOrderCount());
         productItemDTO.setQuantity(product.getQuantity());
         productItemDTO.setShortDescription(product.getShortDescription());
 
         RatingStar ratingStar = product.getRatingStar();
-        if (ratingStar != null) {
-            int totalStar = ratingStar.getStar1() + ratingStar.getStar2() + ratingStar.getStar3() + ratingStar.getStar4() + ratingStar.getStar5();
-            float percentStar = totalStar > 0 ? (float) (ratingStar.getStar1() + ratingStar.getStar2() * 2 + ratingStar.getStar3() * 3 + ratingStar.getStar4() * 4 + ratingStar.getStar5() * 5)
-                    / totalStar : 0;
-            DecimalFormat decimalFormat = new DecimalFormat("#.##");
-            productItemDTO.setPercentStar(Float.parseFloat(decimalFormat.format(percentStar)));
-            productItemDTO.setCountRating(totalStar);
-        }
+        CalcRatingStarDTO calcRatingStarDTO = CommonUtil.calcRatingStarProduct(ratingStar);
+        productItemDTO.setPercentStar(calcRatingStarDTO.getPercentStar());
+        productItemDTO.setCountRating(calcRatingStarDTO.getTotalStar());
 
+        String urlImage = product.getDataImages().stream().sorted(Comparator.comparing(DataImage::getId).reversed())
+                .map(d -> {
+                    try {
+                        return ImageUtil.getUrlImage(d, envUtil.getServerUrlPrefi());
+                    } catch (UnknownHostException e) {
+                        return ImageUtil.DEFAULT_PRODUCT_IMAGE_URL;
+                    }
+                })
+                .findFirst().orElse(ImageUtil.DEFAULT_PRODUCT_IMAGE_URL);
+
+        productItemDTO.setImgUrl(urlImage);
 
         return productItemDTO;
     }
