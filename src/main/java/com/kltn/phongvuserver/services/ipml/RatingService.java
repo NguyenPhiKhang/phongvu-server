@@ -21,7 +21,6 @@ import java.util.*;
 @Service
 @Transactional(rollbackFor = Throwable.class)
 public class RatingService implements IRatingService {
-
     @Autowired
     private RatingRepository ratingRepository;
     @Autowired
