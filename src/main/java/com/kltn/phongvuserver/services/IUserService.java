@@ -10,6 +10,6 @@ public interface IUserService {
     List<User> getListUserFilter(String search, int active, int page, int pageSize);
     int countListUserFilter(String search, int active);
     void autoCreateEmail();
-    boolean checkExistEmail(String email);
+    boolean checkExistEmailOrUsername(String email);
     User registerUser(String name, String email);
 }

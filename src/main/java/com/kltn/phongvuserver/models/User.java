@@ -61,15 +61,15 @@ public class User implements Serializable {
     private Set<SeenProduct> seenProducts = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY,
-            cascade =  CascadeType.ALL,
+            cascade =  {CascadeType.PERSIST, CascadeType.MERGE},
             mappedBy = "user")
     @JsonIgnore
     private Cart cart;
 
-//
-//    @OneToMany(targetEntity = Address.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<Address> addresses;
+
+    @OneToMany(targetEntity = Address.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Address> addresses = new HashSet<>();
 //
 //    @OneToMany(targetEntity = HistorySearch.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JsonIgnore

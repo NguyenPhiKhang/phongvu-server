@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -47,7 +49,7 @@ public class UserService implements IUserService {
             String corpEmail;
             do {
                 corpEmail = mock.emails().domain("gmail.com").val();
-            } while (checkExistEmail(corpEmail));
+            } while (checkExistEmailOrUsername(corpEmail));
 
             user.setEmail(corpEmail);
         });
@@ -56,12 +58,27 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean checkExistEmail(String email) {
-        return false;
+    public boolean checkExistEmailOrUsername(String email) {
+        return userRepository.existsUserByEmailOrUsername(email);
     }
 
     @Override
     public User registerUser(String name, String email) {
-        return null;
+        Random rd = new Random();
+
+        int idUser;
+        do {
+            idUser = 100000000 + rd.nextInt(2000000000);
+        } while (userRepository.existsById(idUser));
+
+        User user = new User();
+        user.setId(idUser);
+        user.setName(name);
+        user.setEmail(email);
+        user.setActive(true);
+        user.setTimeCreated(new Timestamp(System.currentTimeMillis()));
+        user.setTimeUpdated(new Timestamp(System.currentTimeMillis()));
+
+        return userRepository.save(user);
     }
 }

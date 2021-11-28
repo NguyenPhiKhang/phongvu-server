@@ -23,5 +23,6 @@ public interface UserRepository extends JpaRepository<User, Integer>, QuerydslPr
     @Query(value = "select count(*) from users u join accounts a on a.user_id = u.id where a.permission_id = 2 and u.name like %:search% and u.active = case when :active = -1 then u.active else :active end", nativeQuery = true)
     int countListUserFilter(@Param("search") String search, @Param("active") int active);
 
-    boolean existsUserByEmail(String email);
+    @Query("select (count(u) > 0) from User u where u.email=:userAccount or u.account.username=:userAccount")
+    boolean existsUserByEmailOrUsername(@Param("userAccount") String userAccount);
 }
