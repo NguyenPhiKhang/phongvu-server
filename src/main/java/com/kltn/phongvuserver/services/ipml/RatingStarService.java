@@ -5,8 +5,10 @@ import com.kltn.phongvuserver.repositories.RatingStarRepository;
 import com.kltn.phongvuserver.services.IRatingStarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(rollbackFor = Throwable.class)
 public class RatingStarService implements IRatingStarService {
     @Autowired
     private RatingStarRepository ratingStarRepository;

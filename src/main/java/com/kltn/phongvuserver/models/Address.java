@@ -33,12 +33,12 @@ public class Address implements Serializable {
     @Column(name = "default_is")
     private boolean defaultIs;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {})
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
