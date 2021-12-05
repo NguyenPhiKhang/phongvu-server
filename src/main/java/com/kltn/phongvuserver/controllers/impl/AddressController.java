@@ -24,8 +24,8 @@ public class AddressController implements IAddressController {
     private AddressDTOMapper addressDTOMapper;
 
     @Override
-    public String addAddressForUser(int userId, int wardId, Address address) {
-        addressService.addAddressForUser(address, userId, wardId);
+    public String addAddressForUser(int userId, Address address) {
+        addressService.addAddressForUser(address, userId);
         return "add success";
     }
 
@@ -42,5 +42,10 @@ public class AddressController implements IAddressController {
     @Override
     public String updateAddress(Address address) {
         return addressService.updateAddressForUser(address);
+    }
+
+    @Override
+    public AddressDTO getAddressForOrder(int userId) {
+        return addressService.getAddressForOrder(userId);
     }
 }

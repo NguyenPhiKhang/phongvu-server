@@ -10,7 +10,7 @@ import java.util.List;
 @CrossOrigin(value = {"http://localhost:3000", "https://adminfashion-shop.azurewebsites.net"})
 public interface IAddressController {
     @PostMapping("/user/{userId}/add-address")
-    String addAddressForUser(@PathVariable("userId") int userId, @RequestParam("ward") int wardId, @RequestBody Address address);
+    String addAddressForUser(@PathVariable("userId") int userId, @RequestBody Address address);
 
     @GetMapping("/user/{userId}/get-addresses")
     List<AddressDTO> getAddressesOfUser(@PathVariable("userId") int userId);
@@ -20,4 +20,7 @@ public interface IAddressController {
 
     @PutMapping("/address/update")
     String updateAddress(@RequestBody Address address);
+
+    @GetMapping("/address/{userId}/get-address-order")
+    AddressDTO getAddressForOrder(@PathVariable("userId") int userId);
 }

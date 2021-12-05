@@ -1,6 +1,8 @@
 package com.kltn.phongvuserver.services.ipml;
 
+import com.kltn.phongvuserver.mappers.impl.AddressDTOMapper;
 import com.kltn.phongvuserver.models.Address;
+import com.kltn.phongvuserver.models.dto.AddressDTO;
 import com.kltn.phongvuserver.repositories.AddressRepository;
 import com.kltn.phongvuserver.services.IAddressService;
 import com.kltn.phongvuserver.services.IUserService;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -25,8 +28,11 @@ public class AddressService implements IAddressService {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private AddressDTOMapper addressDTOMapper;
+
     @Override
-    public void addAddressForUser(Address address, int userId, int wardId) {
+    public void addAddressForUser(Address address, int userId) {
         Address newAddress = new Address(address.getSpecificAddress(), address.getName(),
                 address.getNumberPhone(), address.isDefaultIs(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
 
@@ -38,7 +44,7 @@ public class AddressService implements IAddressService {
         } while (addressRepository.existsById(idAddress));
 
         newAddress.setId(idAddress);
-        newAddress.setWard(wardService.getWardById(wardId));
+        newAddress.setWard(wardService.getWardById(address.getWard().getId()));
         newAddress.setUser(userService.getUserById(userId));
 
         if (address.isDefaultIs())
@@ -86,5 +92,12 @@ public class AddressService implements IAddressService {
     @Override
     public Address getAddressById(int id) {
         return addressRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public AddressDTO getAddressForOrder(int userId) {
+        return addressDTOMapper.mapRow(addressRepository.findAddressByUserIdOrderByUpdateAtFetchDesc(userId)
+                .stream().max(Comparator.comparing(Address::isDefaultIs).reversed()
+                        .thenComparing(Address::getUpdateAt)).orElse(null));
     }
 }
