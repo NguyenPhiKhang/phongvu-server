@@ -134,6 +134,13 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<SummaryOrderDTO> getSummaryHistoryOrder(int userId) {
-        return orderRepository.getSummaryHistoryOrder(userId);
+        List<SummaryOrderDTO> listAvailableSummary = orderRepository.getSummaryHistoryOrder(userId);
+        return statusOrderRepository.findAll().stream()
+                .map(a->{
+                    SummaryOrderDTO summaryOrderDTO = listAvailableSummary.stream().filter(sm->sm.getStatusId().equals(a.getId())).findFirst().orElse(null);
+                    return new SummaryOrderDTO(a.getId(), a.getName(), summaryOrderDTO==null?0L:summaryOrderDTO.getTotal());
+                })
+                .sorted(Comparator.comparing(SummaryOrderDTO::getStatusId))
+                .collect(Collectors.toList());
     }
 }
