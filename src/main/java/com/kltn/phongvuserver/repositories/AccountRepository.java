@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
-    @Query(value = "select a from Account a join fetch a.permission join fetch a.user u join fetch u.imageAvatar left join fetch u.addresses " +
+    @Query(value = "select a from Account a join fetch a.permission join fetch a.user u left join fetch u.imageAvatar left join fetch u.addresses " +
             "where (a.username = :username or u.email = :username) and a.password=:password")
     Account findByUsernameOrEmailAndPassword(@Param("username") String username, @Param("password") String password);
 

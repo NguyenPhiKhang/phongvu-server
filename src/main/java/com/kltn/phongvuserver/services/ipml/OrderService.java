@@ -5,7 +5,9 @@ import com.kltn.phongvuserver.models.OrderItem;
 import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.models.StatusOrder;
 import com.kltn.phongvuserver.models.dto.InputOrderDTO;
+import com.kltn.phongvuserver.models.dto.InputOrderItemDTO;
 import com.kltn.phongvuserver.models.dto.SummaryOrderDTO;
+import com.kltn.phongvuserver.repositories.CartItemRepository;
 import com.kltn.phongvuserver.repositories.OrderRepository;
 import com.kltn.phongvuserver.repositories.ProductRepository;
 import com.kltn.phongvuserver.repositories.StatusOrderRepository;
@@ -52,6 +54,9 @@ public class OrderService implements IOrderService {
 
     @Autowired
     private StatusOrderRepository statusOrderRepository;
+
+    @Autowired
+    private ICartService cartService;
 //
 //    @Autowired
 //    private IFlashSaleProductService flashSaleProductService;
@@ -81,6 +86,10 @@ public class OrderService implements IOrderService {
         newOrder.setPaymentMethod(paymentService.getPaymentById(orderInput.getPaymentMethod()));
         newOrder.setStatus(statusOrderService.getStatusOrderById(orderInput.getStatus()));
         newOrder.setOrderItems(orderItemService.mapListInputOrderItemDTOToOrderItem(orderInput.getListItem(), newOrder));
+
+        for(InputOrderItemDTO inputOrderItemDTO: orderInput.getListItem()){
+            cartService.removeProductInCart(inputOrderItemDTO.getCartItemId());
+        }
 
         orderRepository.save(newOrder);
     }
