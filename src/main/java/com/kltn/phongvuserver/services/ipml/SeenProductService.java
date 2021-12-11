@@ -47,7 +47,7 @@ public class SeenProductService implements ISeenProductService {
     }
 
     @Override
-    public List<SeenProduct> getListSeenProduct(int userId) {
-        return seenProductRepository.findSeenProductByUserAndLastTime(userId);
+    public List<SeenProduct> getListSeenProductByUserAndLastWeek(int userId) {
+        return seenProductRepository.findSeenProductByUserAndLastWeek(userId);
     }
 }

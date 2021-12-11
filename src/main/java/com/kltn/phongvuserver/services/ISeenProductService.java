@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ISeenProductService {
     void createOrUpdateSeenProduct(int userId, Product product);
-    List<SeenProduct> getListSeenProduct(int userId);
+    List<SeenProduct> getListSeenProductByUserAndLastWeek(int userId);
 }
