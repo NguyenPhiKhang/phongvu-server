@@ -64,11 +64,8 @@ public class ProductService implements IProductService {
 
             products = productRepository.findProductsByCategoryAndBrandOrDemand(listId, demand, brand, pageNew);
         } else {
-            if (category.getParentCategory() != null) {
-                CategoryUtil.getListIdCategory(category.getParentCategory(), listId);
-            } else {
-                listId.add(category.getId());
-            }
+            listId.add(category.getId());
+            CategoryUtil.getListIdCategory(category, listId);
 
             products = productRepository.findProductsByCategoryAndBrand(listId, brand, pageable);
         }
