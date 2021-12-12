@@ -16,6 +16,9 @@ public class UserDTOMapper implements RowMapper<UserDTO, User> {
     @Autowired
     private EnvUtil envUtil;
 
+    @Autowired
+    private AddressDTOMapper addressDTOMapper;
+
     @Override
     public UserDTO mapRow(User user) {
         try {
@@ -38,7 +41,7 @@ public class UserDTOMapper implements RowMapper<UserDTO, User> {
 
             user.getAddresses().forEach(a->{
                 if(a.isDefaultIs()){
-                    userDTO.setAddress(new AddressDTOMapper().mapRow(a));
+                    userDTO.setAddress(addressDTOMapper.mapRow(a));
                 }
             });
 

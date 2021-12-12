@@ -2,6 +2,7 @@ package com.kltn.phongvuserver.repositories;
 
 import com.kltn.phongvuserver.models.Rating;
 import com.kltn.phongvuserver.models.dto.CountRatingProductDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -43,4 +44,13 @@ public interface RatingRepository extends JpaRepository<Rating, Integer>, Queryd
             "group by ri.rating_id \n" +
             "order by r.time_updated desc limit :p,10;", nativeQuery = true)
     List<Rating> findRatingsByProductIdAndHasImage(@Param("productId") int productId, @Param("p") int page);
+
+    @Query(value = "SELECT distinct r FROM Rating r join fetch r.product p left join fetch p.dataImages left join fetch r.dataImages " +
+            "where r.user.id = :userId and r.star = case when :star=0 then r.star else :star end " +
+            "order by r.timeUpdated desc")
+    List<Rating> findRatingByUserAndStar(@Param("userId") int userId, @Param("star") int star, Pageable pageable);
+
+
+    @Query(value = "SELECT star, count(*) as amount FROM phongvu_db.ratings where user_id = :userId group by star order by star asc", nativeQuery = true)
+    List<Object[]> countStarRatingByUser(@Param("userId") int userId);
 }

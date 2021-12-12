@@ -1,6 +1,7 @@
 package com.kltn.phongvuserver.services;
 
 import com.kltn.phongvuserver.models.DataImage;
+import com.kltn.phongvuserver.models.Rating;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

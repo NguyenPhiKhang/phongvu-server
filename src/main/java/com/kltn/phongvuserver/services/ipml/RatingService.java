@@ -11,10 +11,13 @@ import com.kltn.phongvuserver.repositories.RatingRepository;
 import com.kltn.phongvuserver.repositories.RatingStarRepository;
 import com.kltn.phongvuserver.repositories.UserRepository;
 import com.kltn.phongvuserver.services.IRatingService;
+import com.kltn.phongvuserver.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -85,8 +88,8 @@ public class RatingService implements IRatingService {
                 int userIndex;
                 User user;
 //                do {
-                    userIndex = rd.nextInt(users.size());
-                    user = users.get(userIndex);
+                userIndex = rd.nextInt(users.size());
+                user = users.get(userIndex);
 //                } while (ratingRepository.existsByUserIdAndProductId(user.getId(), pd.getId()));
 
 
@@ -116,6 +119,16 @@ public class RatingService implements IRatingService {
     }
 
     @Override
+    public boolean checkExistId(int id) {
+        return ratingRepository.existsById(id);
+    }
+
+    @Override
+    public Rating save(Rating rating) {
+        return ratingRepository.save(rating);
+    }
+
+    @Override
     public CountRatingProductDTO countRatingByStarOfProduct(int productId) {
         return ratingRepository.countRatingByStar(productId);
     }
@@ -138,5 +151,53 @@ public class RatingService implements IRatingService {
     @Override
     public List<Rating> getRatingByProductIdHasImage(int productId, int page) {
         return ratingRepository.findRatingsByProductIdAndHasImage(productId, page);
+    }
+
+    @Override
+    public List<Rating> getRatingByUserAndStar(int userId, int star, int page, int pageSize) {
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(page, pageSize);
+        return ratingRepository.findRatingByUserAndStar(userId, star, pageable);
+    }
+
+    @Override
+    public CountRatingProductDTO countStarRatingByUser(int id) {
+        CountRatingProductDTO countRatingProductDTO = new CountRatingProductDTO();
+
+        List<Object[]> objects = ratingRepository.countStarRatingByUser(id);
+        int total = 0;
+        float totalPercent = 0;
+
+        for (Object[] o : objects) {
+            switch ((int) o[0]) {
+                case 1:
+                    countRatingProductDTO.setTotalStar1(((BigInteger) o[1]).intValue());
+                    total += ((BigInteger) o[1]).intValue();
+                    totalPercent += ((BigInteger) o[1]).intValue() * 1.0;
+                    break;
+                case 2:
+                    countRatingProductDTO.setTotalStar2(((BigInteger) o[1]).intValue());
+                    total += ((BigInteger) o[1]).intValue();
+                    totalPercent += ((BigInteger) o[1]).intValue() * 2.0;
+                    break;
+                case 3:
+                    countRatingProductDTO.setTotalStar3(((BigInteger) o[1]).intValue());
+                    total += ((BigInteger) o[1]).intValue();
+                    totalPercent += ((BigInteger) o[1]).intValue() * 3.0;
+                    break;
+                case 4:
+                    countRatingProductDTO.setTotalStar4(((BigInteger) o[1]).intValue());
+                    total += ((BigInteger) o[1]).intValue();
+                    totalPercent += ((BigInteger) o[1]).intValue() * 4.0;
+                    break;
+                case 5:
+                    countRatingProductDTO.setTotalStar5(((BigInteger) o[1]).intValue());
+                    total += ((BigInteger) o[1]).intValue();
+                    totalPercent += ((BigInteger) o[1]).intValue() * 5.0;
+                    break;
+            }
+        }
+        countRatingProductDTO.setTotalAll(total);
+        countRatingProductDTO.setPercentStar(totalPercent / total);
+        return countRatingProductDTO;
     }
 }

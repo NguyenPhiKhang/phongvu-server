@@ -1,7 +1,9 @@
 package com.kltn.phongvuserver.services;
 
 import com.kltn.phongvuserver.models.User;
+import com.kltn.phongvuserver.models.dto.InputUserUpdateDTO;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface IUserService {
@@ -12,4 +14,5 @@ public interface IUserService {
     void autoCreateEmail();
     boolean checkExistEmailOrUsername(String email);
     User registerUser(String name, String email);
+    User updateUser(InputUserUpdateDTO input_user) throws ParseException;
 }

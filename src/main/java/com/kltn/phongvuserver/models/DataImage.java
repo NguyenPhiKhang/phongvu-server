@@ -35,11 +35,11 @@ public class DataImage implements Serializable {
     @ManyToMany(targetEntity = Product.class,
             mappedBy = "dataImages",
             fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnore
     private Set<Product> products = new HashSet<>();
 
-    @ManyToMany(targetEntity = Rating.class, mappedBy = "dataImages", cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = Rating.class, mappedBy = "dataImages", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Rating> ratings = new HashSet<>();
 
@@ -55,5 +55,9 @@ public class DataImage implements Serializable {
         this.name = name;
         this.type = type;
         this.link = link;
+    }
+
+    public void addRating(Rating rating){
+        ratings.add(rating);
     }
 }

@@ -1,6 +1,7 @@
 package com.kltn.phongvuserver.services.ipml;
 
 import com.kltn.phongvuserver.models.DataImage;
+import com.kltn.phongvuserver.models.Rating;
 import com.kltn.phongvuserver.repositories.DataImageRepository;
 import com.kltn.phongvuserver.services.IImageDataService;
 import lombok.SneakyThrows;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,38 +44,39 @@ public class ImageDataService implements IImageDataService {
     }
 
     @Override
-    @SneakyThrows
     public List<DataImage> storesImageData(List<MultipartFile> multipartFiles) {
         List<DataImage> images = new ArrayList<>();
         for (MultipartFile file : multipartFiles) {
             String fileName = StringUtils.cleanPath((Objects.requireNonNull(file.getOriginalFilename())));
-            DataImage FileDB = new DataImage(fileName, fileName, file.getContentType(), file.getBytes());
-
+            DataImage FileDB = null;
+            try {
+                FileDB = new DataImage(fileName, fileName, file.getContentType(), file.getBytes());
+//                FileDB.addRating(rating);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             System.out.println(fileName);
 
-            images.add(FileDB);
+            if (FileDB != null) {
+                images.add(FileDB);
+            }
         }
-        return imageDataRepository.saveAll(images);
+        return images;
     }
 
-    @SneakyThrows
     @Override
     public DataImage storeImageData(MultipartFile multipartFile) {
         String fileName = StringUtils.cleanPath((Objects.requireNonNull(multipartFile.getOriginalFilename())));
-        DataImage FileDB = new DataImage(fileName, fileName, multipartFile.getContentType(), multipartFile.getBytes());
-
+        DataImage FileDB = null;
+        try {
+            FileDB = new DataImage(fileName, fileName, multipartFile.getContentType(), multipartFile.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(fileName);
 
-        return imageDataRepository.save(FileDB);
+        return FileDB;
     }
-
-//    @SneakyThrows
-//    @Override
-//    public ImageData storeImageData(MultipartFile multipartFile, String id) {
-//
-//        return new ImageData(id, id, multipartFile.getContentType(), multipartFile.getBytes());
-//    }
-
 
     @Override
     public void saveImage(DataImage imageData) {

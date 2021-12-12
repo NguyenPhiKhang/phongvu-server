@@ -2,6 +2,7 @@ package com.kltn.phongvuserver.utils;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +19,10 @@ public class StringUtil {
     public static String convertDateToString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(date);
+    }
+
+    public static Date convertStringToDate(String dateStr, String format) throws ParseException {
+        return new SimpleDateFormat(format).parse(dateStr);
     }
 
     public static String incognitoName(String str){

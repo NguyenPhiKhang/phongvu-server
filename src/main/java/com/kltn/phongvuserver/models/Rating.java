@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -40,7 +41,7 @@ public class Rating implements Serializable {
     @JsonIgnore
     private Product product;
 
-    @ManyToMany(targetEntity = DataImage.class, cascade = CascadeType.ALL)
+    @ManyToMany(targetEntity = DataImage.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "rating_image",
             joinColumns =
@@ -48,4 +49,8 @@ public class Rating implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "image_id", referencedColumnName = "id"))
     @JsonIgnore
     private Set<DataImage> dataImages = new HashSet<>();
+
+    public void addAllDataImages(List<DataImage> list){
+        dataImages.addAll(list);
+    }
 }
