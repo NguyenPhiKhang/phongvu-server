@@ -33,6 +33,6 @@ public class CosineSimilarityService implements ICosineSimilarityService {
 
     @Override
     public void removeAll(){
-        cosineSimilarityRepository.deleteAll();;
+        cosineSimilarityRepository.deleteAllCosine();
     }
 }

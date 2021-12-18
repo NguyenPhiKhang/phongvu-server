@@ -11,6 +11,7 @@ import com.kltn.phongvuserver.models.dto.ProductItemDTO;
 import com.kltn.phongvuserver.models.dto.SearchProductDTO;
 import com.kltn.phongvuserver.models.recommendsystem.AVGRatedProductDTO;
 import com.kltn.phongvuserver.models.recommendsystem.RatingRSDTO;
+import com.kltn.phongvuserver.repositories.CosineSimilarityRepository;
 import com.kltn.phongvuserver.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -38,6 +43,9 @@ public class ProductController implements IProductController {
     private ICosineSimilarityService cosineSimilarityService;
 
     @Autowired
+    private CosineSimilarityRepository cosineSimilarityRepository;
+
+    @Autowired
     private IHistorySearchService historySearchService;
 
     @Autowired
@@ -45,6 +53,9 @@ public class ProductController implements IProductController {
 
     @Autowired
     private ProductItemDTOMapper productItemDTOMapper;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page) {
@@ -78,9 +89,11 @@ public class ProductController implements IProductController {
 
     @Override
     public ResponseEntity<String> createCosineSimilarity() {
+        long startTime = new Date().getTime();
+
         List<Integer> list_product_rated = ratingService.getProductsRated();
 
-        List<RatingRSDTO> listRatingRS = ratingService.getAll().stream().map(value -> new RatingRSDTOMapper().mapRow(value)).collect(Collectors.toList());
+        List<RatingRSDTO> listRatingRS = ratingService.getAll().stream().map(value -> ratingRSDTOMapper.mapRow(value)).collect(Collectors.toList());
 
         List<RatingRSDTO> listRatingNormalized = listRatingRS.stream().map(rt -> new RatingRSDTO(rt.getUserId(), rt.getProductId(), rt.getValue())).collect(Collectors.toList());
 
@@ -94,8 +107,13 @@ public class ProductController implements IProductController {
         calcCosineSimilarity(list_product_rated, listRatingNormalized, cosSimilarities);
 
         cosineSimilarityService.removeAll();
-        cosineSimilarityService.saveAll(cosSimilarities);
+        cosSimilarities.forEach(c -> em.persist(c));
         recommendRatingService.removeAll();
+
+        long endTime = new Date().getTime();
+        long difference = endTime - startTime;
+        System.out.println("Elapsed time in milliseconds: " + difference);
+
         return ResponseEntity.ok().body("done");
     }
 
@@ -230,64 +248,94 @@ public class ProductController implements IProductController {
     }
 
     private void calcCosineSimilarity(List<Integer> list_product_rated, List<RatingRSDTO> listRatingNormalized, List<CosineSimilarity> cosSimilarities) {
-        int size_list = list_product_rated.size();
-        for (int i = size_list - 1; i > 0; i--) {
-            int product_id1 = list_product_rated.get(i);
-            List<RatingRSDTO> user_rated_product1 = calcUserRatedProduct(listRatingNormalized, product_id1);
-            for (int j = i - 1; j >= 0; j--) {
-                int product_id2 = list_product_rated.get(j);
-                List<RatingRSDTO> user_rated_product2 = calcUserRatedProduct(listRatingNormalized, product_id2);
+//        int size_list = list_product_rated.size();
+//        for (int i = size_list - 1; i > 0; i--) {
+//            int product_id1 = list_product_rated.get(i);
+//            List<RatingRSDTO> user_rated_product1 = calcUserRatedProduct(listRatingNormalized, product_id1);
+//            for (int j = i - 1; j >= 0; j--) {
+//                int product_id2 = list_product_rated.get(j);
+//                List<RatingRSDTO> user_rated_product2 = calcUserRatedProduct(listRatingNormalized, product_id2);
+//
+//                double pd1_dot_pd2 = p1_dot_p2(user_rated_product1, user_rated_product2);
+//                double norm_pd1 = calc_norm(user_rated_product1);
+//                double norm_pd2 = calc_norm(user_rated_product2);
+//                double norm_pd1_mul_norm_pd2 = norm_pd1 * norm_pd2;
+//                double cosineSimilarity = norm_pd1_mul_norm_pd2 != 0.0 ? pd1_dot_pd2 / norm_pd1_mul_norm_pd2 : -1;
+//
+//                CosineSimilarity a = new CosineSimilarity(product_id1, product_id2, cosineSimilarity);
+//                cosSimilarities.add(a);
+//                System.out.println("i: " + i + " - j: " + j);
+//            }
+//        }
 
-                double pd1_dot_pd2 = p1_dot_p2(user_rated_product1, user_rated_product2);
-                double norm_pd1 = calc_norm(user_rated_product1);
-                double norm_pd2 = calc_norm(user_rated_product2);
-                double norm_pd1_mul_norm_pd2 = norm_pd1 * norm_pd2;
-                double cosineSimilarity = norm_pd1_mul_norm_pd2 != 0.0 ? pd1_dot_pd2 / norm_pd1_mul_norm_pd2 : -1;
+        List<Integer> listExisted = new ArrayList<>();
 
-                CosineSimilarity a = new CosineSimilarity(product_id1, product_id2, cosineSimilarity);
-                cosSimilarities.add(a);
-                System.out.println("i: " + i + " - j: " + j);
-            }
-        }
+        cosSimilarities.addAll(list_product_rated.stream().flatMap(l -> {
+            List<RatingRSDTO> user_rated_product1 = calcUserRatedProduct(listRatingNormalized, l);
+            System.out.println("product: "+ l);
+            Stream<CosineSimilarity> listCosine = list_product_rated.stream().filter(i -> !listExisted.contains(i))
+                    .map(k-> {
+                        List<RatingRSDTO> user_rated_product2 = calcUserRatedProduct(listRatingNormalized, k);
+
+                        double pd1_dot_pd2 = p1_dot_p2(user_rated_product1, user_rated_product2);
+                        double norm_pd1 = calc_norm(user_rated_product1);
+                        double norm_pd2 = calc_norm(user_rated_product2);
+                        double norm_pd1_mul_norm_pd2 = norm_pd1 * norm_pd2;
+                        double cosineSimilarity = norm_pd1_mul_norm_pd2 != 0.0 ? pd1_dot_pd2 / norm_pd1_mul_norm_pd2 : -1;
+
+                        return new CosineSimilarity(l, k, cosineSimilarity);
+                    });
+
+            listExisted.add(l);
+            System.out.println("size: "+ listExisted.size()+ "/ "+list_product_rated.size());
+            return listCosine;
+        }).collect(Collectors.toList()));
     }
 
     private List<RatingRSDTO> calcUserRatedProduct(List<RatingRSDTO> list, int pd) {
-        List<RatingRSDTO> a = new ArrayList<>();
-        int size_list = list.size();
-        for (int i = 0; i < size_list; i++) {
-            if (list.get(i).getProductId() == pd) {
-                a.add(list.get(i));
-            }
-        }
-        return a;
+        return list.stream().filter(ratingRSDTO -> ratingRSDTO.getProductId() == pd).collect(Collectors.toList());
     }
 
     private double p1_dot_p2(List<RatingRSDTO> list1, List<RatingRSDTO> list2) {
-        int size_list1 = list1.size();
-        int size_list2 = list2.size();
-        double p1_dot_p2 = 0.0;
-        for (int i = 0; i < size_list1; i++) {
-            for (int j = 0; j < size_list2; j++) {
-                RatingRSDTO rt1 = list1.get(i);
-                RatingRSDTO rt2 = list2.get(j);
-                if (rt1.getUserId() == rt2.getUserId()) {
-                    p1_dot_p2 += (rt1.getValue() * rt2.getValue());
-                    break;
-                }
-            }
-        }
-        return p1_dot_p2;
+//        int size_list1 = list1.size();
+//        int size_list2 = list2.size();
+//        double p1_dot_p2 = 0.0;
+//        for (int i = 0; i < size_list1; i++) {
+//            for (int j = 0; j < size_list2; j++) {
+//                RatingRSDTO rt1 = list1.get(i);
+//                RatingRSDTO rt2 = list2.get(j);
+//                if (rt1.getUserId() == rt2.getUserId()) {
+//                    p1_dot_p2 += (rt1.getValue() * rt2.getValue());
+//                    break;
+//                }
+//            }
+//        }
+
+//        return IntStream.range(0, list1.size())
+//                .filter(v -> list1.get(v).getUserId() == list2.get(v).getUserId())
+//                .mapToDouble(v -> list1.get(v).getValue() * list2.get(v).getValue())
+//                .sum();
+
+        return list1.stream()
+                .mapToDouble(v-> list2.stream().filter(v1->v1.getUserId()==v.getUserId()).mapToDouble(v1->v1.getValue()*v.getValue()).sum())
+                .sum();
+
+
+//        return p1_dot_p2;
     }
 
     private double calc_norm(List<RatingRSDTO> list) {
-        int size_list = list.size();
-        double norm = 0.0;
-        for (int i = 0; i < size_list; i++) {
-            RatingRSDTO rt = list.get(i);
-            if (rt.getValue() != 0.0) {
-                norm += Math.pow(rt.getValue(), 2);
-            }
-        }
+//        int size_list = list.size();
+//        double norm = 0.0;
+//        for (int i = 0; i < size_list; i++) {
+//            RatingRSDTO rt = list.get(i);
+//            if (rt.getValue() != 0.0) {
+//                norm += Math.pow(rt.getValue(), 2);
+//            }
+//        }
+//        return Math.sqrt(norm);
+
+        double norm = list.stream().filter(rt -> rt.getValue() != 0.0).mapToDouble(v -> Math.pow(v.getValue(), 2)).sum();
         return Math.sqrt(norm);
     }
 

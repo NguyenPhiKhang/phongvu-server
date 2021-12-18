@@ -24,7 +24,7 @@ public class RecommendRatingService implements IRecommendRatingService {
     }
 
     public void removeAll(){
-        recommendRatingRepository.deleteAll();
+        recommendRatingRepository.deleteAllRecommend();
     }
 
     @Override
