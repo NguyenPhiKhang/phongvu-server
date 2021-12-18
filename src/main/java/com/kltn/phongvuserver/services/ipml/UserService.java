@@ -36,7 +36,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<Integer> getListIdUser() {
-        return null;
+        return userRepository.getAllIdUser();
     }
 
     @Override

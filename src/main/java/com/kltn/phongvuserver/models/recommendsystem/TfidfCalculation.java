@@ -1,7 +1,10 @@
 package com.kltn.phongvuserver.models.recommendsystem;
 
+import com.google.common.base.Strings;
 import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.utils.VNCharacterUtil;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -100,12 +103,18 @@ public class TfidfCalculation {
                 docProduct = product.getName();
             else docProduct = product.getShortDescription();
         } else {
-            if(sameFor.equals("name"))
+            if (sameFor.equals("name"))
                 docProduct = product.getName();
-            else if(sameFor.equals("description")) {
-                docProduct = product.getShortDescription();
-            }else if(sameFor.equals("category"))
+            else if (sameFor.equals("description")) {
+                docProduct = Jsoup.parse(product.getShortDescription()).body().text();
+            } else if (sameFor.equals("category")) {
                 docProduct = product.getCategory().getName();
+            } else if(sameFor.equals("name&desc")){
+                docProduct = Strings.repeat(product.getName() + " ", 10) + Jsoup.parse(product.getDescription()).body().text();
+            }else if(sameFor.equals("name&short")){
+                docProduct = Strings.repeat(product.getName() + " ", 10) + Jsoup.parse(product.getShortDescription()).body().text();
+            }
+
         }
         HashMap<String, Integer> wordCount = getTerms(docProduct, wordList);
         docProperty.setWordCountMap(wordCount);

@@ -142,7 +142,7 @@ public class RecommendSystemUtil {
         return listProductSearch;
     }
 
-    public static HashMap<Product, String> calcCosineSimilaritySearch(List<String> topSearch, List<Product> list){
+    public static HashMap<String, Product> calcCosineSimilaritySearch(List<String> topSearch, List<Product> list){
         int noOfDocs = list.size();
 
         TfidfCalculation TfidfObj = new TfidfCalculation();
@@ -151,7 +151,7 @@ public class RecommendSystemUtil {
         DocumentProperties[] docProperties = new DocumentProperties[noOfDocs];
         SortedSet<String> wordList = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         for (int i = 0; i < noOfDocs; i++) {
-            docProperties[i] = TfidfObj.calculateTF(list.get(i), wordList, "category");
+            docProperties[i] = TfidfObj.calculateTF(list.get(i), wordList, "name");
         }
 
         //calculating InverseDocument frequency
@@ -163,7 +163,7 @@ public class RecommendSystemUtil {
             listTFIDF.put(list.get(i), TfidfObj.calculateTFIDF(docProperties[i], inverseDocFreqMap));
         }
 
-        HashMap<Product, String> products = new HashMap<>();
+        HashMap<String, Product> products = new HashMap<>();
 
         for(String search: topSearch){
             SortedSet<String> wordListSearch = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -196,7 +196,7 @@ public class RecommendSystemUtil {
                     max_cosine = cosine;
                 }
             }
-            products.put(product, search);
+            products.put(search, product);
         }
 
         return products;

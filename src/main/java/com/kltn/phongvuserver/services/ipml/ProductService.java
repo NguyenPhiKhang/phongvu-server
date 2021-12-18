@@ -193,11 +193,11 @@ public class ProductService implements IProductService {
 
     @Override
     public List<SearchProductDTO> getProductSearch(String search, int page) {
-        List<Product> list = productRepository.findProductsByVisibilityTrue();
+        List<Product> list = productRepository.findProductsForSearch();
 
         System.out.println(page);
 
-        return RecommendSystemUtil.calcCosineSimilarityText(search, list, "category").entrySet().stream().sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
+        return RecommendSystemUtil.calcCosineSimilarityText(search, list, "name&short").entrySet().stream().sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
                 .skip(page * 14L)
                 .limit(14)
                 .map(entry -> searchProductDTOMapper.mapRow(entry))

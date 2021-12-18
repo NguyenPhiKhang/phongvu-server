@@ -30,12 +30,12 @@ public interface HistorySearchRepository extends JpaRepository<HistorySearch, In
 
     void deleteAllByUserId(int user_id);
 
-    @Query(value = "select keyword from fashionshop_db.history_search group by keyword order by count(keyword) desc", nativeQuery = true)
+    @Query(value = "select keyword from phongvu_db.history_search group by keyword order by count(keyword) desc", nativeQuery = true)
     List<String> getAllSearch();
 
-    @Query(value = "select keyword from fashionshop_db.history_search group by keyword order by count(keyword) desc", nativeQuery = true)
+    @Query(value = "select keyword from phongvu_db.history_search group by keyword order by count(keyword) desc", nativeQuery = true)
     Page<String> getTopSearch(Pageable pageable);
 
-    @Query(value = "SELECT keyword FROM fashionshop_db.history_search where keyword like :txt_search% group by keyword order by count(keyword) desc limit 15", nativeQuery = true)
+    @Query(value = "SELECT keyword FROM phongvu_db.history_search where keyword like :txt_search% group by keyword order by count(keyword) desc limit 15", nativeQuery = true)
     Set<String> getTopSearchLike(@Param("txt_search") String keyword);
 }

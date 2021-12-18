@@ -14,16 +14,16 @@ import java.util.Comparator;
 import java.util.Map;
 
 @Component
-public class HotSearchDTOMapper implements RowMapper<HotSearchDTO, Map.Entry<Product, String>> {
+public class HotSearchDTOMapper implements RowMapper<HotSearchDTO, Map.Entry<String, Product>> {
     @Autowired
     private EnvUtil envUtil;
 
     @Override
-    public HotSearchDTO mapRow(Map.Entry<Product, String> productStringHashMap) {
+    public HotSearchDTO mapRow(Map.Entry<String, Product> productStringHashMap) {
         try {
             HotSearchDTO hotSearchDTO = new HotSearchDTO();
 
-            Product product = productStringHashMap.getKey();
+            Product product = productStringHashMap.getValue();
 
             String urlImage = product.getDataImages().stream().sorted(Comparator.comparing(DataImage::getId).reversed())
                     .map(d -> {
@@ -35,7 +35,8 @@ public class HotSearchDTOMapper implements RowMapper<HotSearchDTO, Map.Entry<Pro
                     })
                     .findFirst().orElse(ImageUtil.DEFAULT_PRODUCT_IMAGE_URL);
 
-            hotSearchDTO.setKeyword(productStringHashMap.getValue());
+            hotSearchDTO.setLinkImage(urlImage);
+            hotSearchDTO.setKeyword(productStringHashMap.getKey());
             return hotSearchDTO;
         } catch (Exception ex) {
             return null;

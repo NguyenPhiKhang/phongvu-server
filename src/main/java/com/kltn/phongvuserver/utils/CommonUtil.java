@@ -15,7 +15,7 @@ public class CommonUtil {
 
     public static CalcRatingStarDTO calcRatingStarProduct(RatingStar ratingStar) {
         CalcRatingStarDTO calcRatingStarDTO = new CalcRatingStarDTO(0, 0);
-        if (ratingStar != null){
+        if (ratingStar != null) {
             int totalStar = ratingStar.getStar1() + ratingStar.getStar2() + ratingStar.getStar3() + ratingStar.getStar4() + ratingStar.getStar5();
             float percentStar = totalStar > 0 ? (float) (ratingStar.getStar1() + ratingStar.getStar2() * 2 + ratingStar.getStar3() * 3 + ratingStar.getStar4() * 4 + ratingStar.getStar5() * 5)
                     / totalStar : 0;
@@ -28,11 +28,11 @@ public class CommonUtil {
         return calcRatingStarDTO;
     }
 
-    public static Pageable getPageForNativeQueryIsFalse(int page, int pageSize){
+    public static Pageable getPageForNativeQueryIsFalse(int page, int pageSize) {
         return PageRequest.of(page - 1, pageSize);
     }
 
-    public static int getPageForNativeQueryIsTrue(int page, int pageSize){
+    public static int getPageForNativeQueryIsTrue(int page, int pageSize) {
         return page < 1 ? 0 : (page - 1) * pageSize;
     }
 }

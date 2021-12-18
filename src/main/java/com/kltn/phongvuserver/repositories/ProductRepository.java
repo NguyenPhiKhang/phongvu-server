@@ -23,6 +23,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
 
     List<Product> findProductsByVisibilityTrue();
 
+    @Query(value = "select p from Product p left join fetch p.ratingStar left join fetch p.dataImages" +
+            " where p.visibility = true")
+    List<Product> findProductsForSearch();
+
     @Query("select p from Product p where p.visibility = true")
     List<Product> getProductsVisibilityTrue();
 
@@ -63,7 +67,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
     @Query(value = "call calculate_quantile();", nativeQuery = true)
     float calculateQuantile();
 
-    @Query(value = "select p.* from rating_star as r join products as p on r.id = p.rating_star_id where (star1+star2+star3+star4+star5)>=:m order by ((((star1+star2+star3+star4+star5)/((star1+star2+star3+star4+star5)+:m))*(case when (star1+star2+star3+star4+star5)>0 then (star1 + star2*2 + star3*3 + star4*4 + star5*5)/(star1+star2+star3+star4+star5) else 0 end)) + ((:m/(:m+(star1+star2+star3+star4+star5)))*:C)) desc limit :page, :pageSize;", nativeQuery = true)
+    @Query(value = "select p.* from rating_star as r join products as p on r.id = p.rating_star_id where (star1+star2+star3+star4+star5)>=:m order by ((((star1+star2+star3+star4+star5)/((star1+star2+star3+star4+star5)+:m))*(case when (star1+star2+star3+star4+star5)>0 then (star1 + star2*2 + star3*3 + star4*4 + star5*5)/(star1+star2+star3+star4+star5) else 0 end)) + ((:m/(:m+(star1+star2+star3+star4+star5)))*:C)) desc limit :page, :pageSize", nativeQuery = true)
     List<Product> topRatingProducts(@Param("m") float m, @Param("C") float C, @Param("page") int page, @Param("pageSize") int pageSize);
 
     @Query("select u from Product u where u.id in (:products)")

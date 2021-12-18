@@ -6,6 +6,7 @@ import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.models.recommendsystem.HotSearchDTO;
 import com.kltn.phongvuserver.repositories.HistorySearchRepository;
 import com.kltn.phongvuserver.services.*;
+import com.kltn.phongvuserver.utils.CommonUtil;
 import com.kltn.phongvuserver.utils.RecommendSystemUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -85,7 +86,9 @@ public class HistorySearchService implements IHistorySearchService {
         List<String> listNameCategories = categoryService.getAllNameCategories();
         List<String> newWord = new ArrayList<>();
         listNameCategories.forEach(c-> {
-            newWord.addAll(Arrays.asList(c.split(" - ")));
+            if(!(c.contains("thương hiệu")||  c.contains("nhu cầu"))){
+                newWord.addAll(Arrays.asList(c.split(" & ")));
+            }
         });
         List<Integer> listIdUser = userService.getListIdUser();
 
@@ -120,8 +123,7 @@ public class HistorySearchService implements IHistorySearchService {
     @Override
     public List<HotSearchDTO> getTopSearchItem(int page, int size) {
 //        return historySearchRepository.getTopSearch();
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<String> pageTopSearches = historySearchRepository.getTopSearch(pageable);
+        Page<String> pageTopSearches = historySearchRepository.getTopSearch(CommonUtil.getPageForNativeQueryIsFalse(page, size));
         List<String> topSearches = pageTopSearches.getContent();
         System.out.println(topSearches);
         List<Product> listProduct = productService.getAllProductVisibility();
@@ -131,8 +133,7 @@ public class HistorySearchService implements IHistorySearchService {
 
     @Override
     public List<String> getTopSearch(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<String> pageTopSearch = historySearchRepository.getTopSearch(pageable);
+        Page<String> pageTopSearch = historySearchRepository.getTopSearch(CommonUtil.getPageForNativeQueryIsFalse(page,  size));
         System.out.println(pageTopSearch.getContent());
         return pageTopSearch.getContent();
     }
