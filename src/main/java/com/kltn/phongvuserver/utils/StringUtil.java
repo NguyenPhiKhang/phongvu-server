@@ -35,4 +35,16 @@ public class StringUtil {
         }
         return sb.toString();
     }
+
+    public static boolean checkStringIsNumeric(String number) {
+        if (number == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+    }
 }

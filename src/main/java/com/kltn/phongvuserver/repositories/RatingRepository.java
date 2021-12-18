@@ -2,6 +2,7 @@ package com.kltn.phongvuserver.repositories;
 
 import com.kltn.phongvuserver.models.Rating;
 import com.kltn.phongvuserver.models.dto.CountRatingProductDTO;
+import com.kltn.phongvuserver.models.recommendsystem.AVGRatedProductDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,9 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Integer>, QuerydslPredicateExecutor<Rating> {
     boolean existsByUserIdAndProductId(int user_id, int product_id);
+
+    @Query(value = "select count(*) as col_0_0_ from ratings where user_id=:uId", nativeQuery = true)
+    int existsByUserId(@Param("uId") int userId);
 
     @Query(value = "select new com.kltn.phongvuserver.models.dto.CountRatingProductDTO(p.ratingStar.star1+p.ratingStar.star2+p.ratingStar.star3+p.ratingStar.star4+p.ratingStar.star5, p.ratingStar.star1, p.ratingStar.star2, p.ratingStar.star3, p.ratingStar.star4, p.ratingStar.star5) \n" +
             "from Product p \n" +
@@ -50,7 +54,17 @@ public interface RatingRepository extends JpaRepository<Rating, Integer>, Queryd
             "order by r.timeUpdated desc")
     List<Rating> findRatingByUserAndStar(@Param("userId") int userId, @Param("star") int star, Pageable pageable);
 
-
     @Query(value = "SELECT star, count(*) as amount FROM phongvu_db.ratings where user_id = :userId group by star order by star asc", nativeQuery = true)
     List<Object[]> countStarRatingByUser(@Param("userId") int userId);
+
+    List<Rating> findAllByOrderByProductAsc();
+
+    @Query(value = "select distinct product_id from ratings order by product_id asc", nativeQuery = true)
+    List<Integer> findProductsRated();
+
+    @Query(value = "select distinct user_id from ratings order by user_id asc", nativeQuery = true)
+    List<Integer> findUsersRated();
+
+    @Query("select new com.kltn.phongvuserver.models.recommendsystem.AVGRatedProductDTO(u.product.id, avg(u.star)) from Rating u group by u.product order by u.product.id asc ")
+    List<AVGRatedProductDTO> avgRatedProduct();
 }

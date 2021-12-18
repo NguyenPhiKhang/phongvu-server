@@ -2,6 +2,7 @@ package com.kltn.phongvuserver.repositories;
 
 import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.repositories.custom.ProductRepositoryCustom;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
     int existsProductHaveDemand(@Param("productId") int productId, @Param("demandId") int demandId);
 
     List<Product> findProductsByVisibilityTrue();
+
+    @Query("select p from Product p where p.visibility = true")
+    List<Product> getProductsVisibilityTrue();
 
     @Query(value = "select distinct p.* from products p, categories c, demand_product dp, brands b, image_product ip, data_images di\n" +
             "where p.category_id = c.id and dp.product_id = p.id and p.brand_id = b.id and p.id = ip.product_id and di.id = ip.image_id\n" +
@@ -51,4 +55,32 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
             "left join fetch p.productAttributes pa join fetch pa.attribute " +
             "where p.id = :id and p.visibility=true")
     Product findProductDetailById(@Param("id") int id);
+
+    // Calculate mean of vote average column
+    @Query(value = "SELECT avg(case when (star1+star2+star3+star4+star5)>0 then (star1 + star2*2 + star3*3 + star4*4 + star5*5)/(star1+star2+star3+star4+star5) else 0 end) FROM rating_star;", nativeQuery = true)
+    float meanOfVoteAverage();
+
+    @Query(value = "call calculate_quantile();", nativeQuery = true)
+    float calculateQuantile();
+
+    @Query(value = "select p.* from rating_star as r join products as p on r.id = p.rating_star_id where (star1+star2+star3+star4+star5)>=:m order by ((((star1+star2+star3+star4+star5)/((star1+star2+star3+star4+star5)+:m))*(case when (star1+star2+star3+star4+star5)>0 then (star1 + star2*2 + star3*3 + star4*4 + star5*5)/(star1+star2+star3+star4+star5) else 0 end)) + ((:m/(:m+(star1+star2+star3+star4+star5)))*:C)) desc limit :page, :pageSize;", nativeQuery = true)
+    List<Product> topRatingProducts(@Param("m") float m, @Param("C") float C, @Param("page") int page, @Param("pageSize") int pageSize);
+
+    @Query("select u from Product u where u.id in (:products)")
+    List<Product> findProductByListIdProduct(@Param("products") List<Integer> products);
+
+    @Query(value = "call get_shortdesc_name(:productId)", nativeQuery = true)
+    String getShortDescriptionOrName(@Param("productId") int productId);
+
+    @Query(value = "Select c.name from products p join categories c on p.category_id = c.id where p.id=:id", nativeQuery = true)
+    String findNameCategoryByProduct(@Param("id") int id);
+
+    @Query("select p from Product p where p.visibility = true and p.id <> :productId")
+    List<Product> getProductAndShortDescriptionExceptProduct(@Param("productId") int productId);
+
+    @Query(value = "Select case when (p.description <> '' and p.description is not null) then p.short_description else p.name end as txt_description, s.count as count_seen, s.product_id as product_id from `phongvu_db`.`products` as p inner join `phongvu_db`.`seen_products` as s on p.id = s.product_id where s.user_id = :userId and CURRENT_TIMESTAMP - s.last_time < 7000000 order by s.last_time desc", nativeQuery = true)
+    Page<Object[]> getShortDescriptionOrNameByUser(@Param("userId") int userId, Pageable pageable);
+
+    @Query("select p from Product p where p.visibility = true and p.id not in :listIdProduct")
+    List<Product> getProductAndShortDescriptionExceptListProduct(@Param("listIdProduct") List<Integer> listIdProduct);
 }

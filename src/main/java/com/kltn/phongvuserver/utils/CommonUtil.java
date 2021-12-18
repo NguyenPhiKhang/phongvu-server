@@ -33,6 +33,6 @@ public class CommonUtil {
     }
 
     public static int getPageForNativeQueryIsTrue(int page, int pageSize){
-        return page < 1 ? 0 : (page - 1) * 20;
+        return page < 1 ? 0 : (page - 1) * pageSize;
     }
 }

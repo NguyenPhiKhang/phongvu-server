@@ -20,4 +20,9 @@ public interface CategoryRepository extends JpaRepository<Category, Integer>, Qu
 
     @Query(value = "select c from Category c left join fetch c.categories where c.id = :id")
     Category findCategoryFetchSubCategories(@Param("id") int id);
+
+    @Query("select c.name from Category c where c.level<>0")
+    List<String> getAllName();
+
+
 }

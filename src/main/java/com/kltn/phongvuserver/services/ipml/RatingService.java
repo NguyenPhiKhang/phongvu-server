@@ -6,6 +6,8 @@ import com.kltn.phongvuserver.models.Rating;
 import com.kltn.phongvuserver.models.RatingStar;
 import com.kltn.phongvuserver.models.User;
 import com.kltn.phongvuserver.models.dto.CountRatingProductDTO;
+import com.kltn.phongvuserver.models.recommendsystem.AVGRatedProductDTO;
+import com.kltn.phongvuserver.models.recommendsystem.RatingRSDTO;
 import com.kltn.phongvuserver.repositories.ProductRepository;
 import com.kltn.phongvuserver.repositories.RatingRepository;
 import com.kltn.phongvuserver.repositories.RatingStarRepository;
@@ -119,6 +121,16 @@ public class RatingService implements IRatingService {
     }
 
     @Override
+    public int checkUserIsRated(int uId) {
+        return ratingRepository.existsByUserId(uId);
+    }
+
+    @Override
+    public List<Rating> getAll() {
+        return ratingRepository.findAllByOrderByProductAsc();
+    }
+
+    @Override
     public boolean checkExistId(int id) {
         return ratingRepository.existsById(id);
     }
@@ -199,5 +211,50 @@ public class RatingService implements IRatingService {
         countRatingProductDTO.setTotalAll(total);
         countRatingProductDTO.setPercentStar(totalPercent / total);
         return countRatingProductDTO;
+    }
+
+    @Override
+    public int numberUserInRatings() {
+        return 0;
+    }
+
+    @Override
+    public int numberProductInRatings() {
+        return 0;
+    }
+
+    @Override
+    public List<Integer> getUsersRated() {
+        return ratingRepository.findUsersRated();
+    }
+
+    @Override
+    public List<Integer> getProductsRated() {
+        return ratingRepository.findProductsRated();
+    }
+
+    @Override
+    public List<AVGRatedProductDTO> calcAVGRatedProduct() {
+        return ratingRepository.avgRatedProduct();
+    }
+
+    @Override
+    public List<Rating> getAllRatingByProductId(int productId, int page) {
+        return null;
+    }
+
+    @Override
+    public void autoInsertRating() {
+
+    }
+
+    @Override
+    public List<RatingRSDTO> getUserLeftJoinRating() {
+        return null;
+    }
+
+    @Override
+    public Rating getRatingByProductAndProductOption(int userId, int productId, int productOptionId) {
+        return null;
     }
 }

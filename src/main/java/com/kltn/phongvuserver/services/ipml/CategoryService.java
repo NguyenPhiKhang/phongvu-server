@@ -112,7 +112,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public List<String> getAllNameCategories() {
-        return null;
+        return categoryRepository.getAllName();
     }
 
     @Override
