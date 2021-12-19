@@ -80,12 +80,12 @@ public class ProductService implements IProductService {
     private SearchProductDTOMapper searchProductDTOMapper;
 
     @Override
-    public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page) {
+    public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page, int pageSize) {
         Category category = categoryRepository.findCategoryFetchSubCategories(idCategory);
         Set<Integer> listId = new HashSet<>();
 
-        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(page, 20);
-        int pageNew = CommonUtil.getPageForNativeQueryIsTrue(page, 20);
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(page, pageSize);
+        int pageNew = CommonUtil.getPageForNativeQueryIsTrue(page, pageSize);
 
         List<Product> products;
         if (category.getName().contains("nhu cầu") || category.getName().contains("thương hiệu")) {
@@ -192,20 +192,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<SearchProductDTO> getProductSearch(String search, int page) {
+    public List<SearchProductDTO> getProductSearch(String search, int page, int pageSize) {
         List<Product> list = productRepository.findProductsForSearch();
 
         System.out.println(page);
 
         return RecommendSystemUtil.calcCosineSimilarityText(search, list, "name&short").entrySet().stream().sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip(page * 14L)
-                .limit(14)
+                .skip((long) page * pageSize)
+                .limit(pageSize)
                 .map(entry -> searchProductDTOMapper.mapRow(entry))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProductItemDTO> getProductsSimilarity(int id, int page) {
+    public List<ProductItemDTO> getProductsSimilarity(int id, int page, int pageSize) {
         String shortDescOrName = productRepository.getShortDescriptionOrName(id);
         String categoryName = productRepository.findNameCategoryByProduct(id);
 //        String productName = productRepository.getNameProduct(id);
@@ -215,16 +215,16 @@ public class ProductService implements IProductService {
 
         return RecommendSystemUtil.calcCosineSimilarityText(categoryName, listProduct, "category").entrySet().stream()
                 .sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip(page * 14L)
-                .limit(14)
+                .skip((long) page * pageSize)
+                .limit(pageSize)
                 .map(v -> productItemDTOMapper.mapRow(v.getKey()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProductItemDTO> getProductsAlsoLike(int userId, int page, String sameFor) {
+    public List<ProductItemDTO> getProductsAlsoLike(int userId, int page, int pageSize, String sameFor) {
         List<Integer> listIdProduct = new ArrayList<>();
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(0, 10);
         Page<Object[]> pageSeen = productRepository.getShortDescriptionOrNameByUser(userId, pageable);
         List<DescriptionCountDTO> listSeen = pageSeen.getContent().stream().map(v -> {
             listIdProduct.add((Integer) v[2]);
@@ -284,8 +284,8 @@ public class ProductService implements IProductService {
 
         return listProductAlsoLike.entrySet().stream()
                 .sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip(page * 14L)
-                .limit(14)
+                .skip((long) page * pageSize)
+                .limit(pageSize)
                 .map(v -> productItemDTOMapper.mapRow(v.getKey()))
                 .collect(Collectors.toList());
     }

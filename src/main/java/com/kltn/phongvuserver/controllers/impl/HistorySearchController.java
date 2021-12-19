@@ -59,8 +59,8 @@ public class HistorySearchController implements IHistorySearchController {
     }
 
     @Override
-    public ResponseEntity<List<HotSearchDTO>> getHotSearchItem(int page) {
-        return ResponseEntity.ok().body(historySearchService.getTopSearchItem(page, 4));
+    public ResponseEntity<List<HotSearchDTO>> getHotSearchItem(int page, int pageSize) {
+        return ResponseEntity.ok().body(historySearchService.getTopSearchItem(page, pageSize));
     }
 
     @Override

@@ -54,8 +54,8 @@ public class FavoriteService implements IFavoriteService {
     }
 
     @Override
-    public List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page) {
-        return favoriteRepository.getFavoriteByUserFetchForGetListProduct(userId, CommonUtil.getPageForNativeQueryIsFalse(page, 20))
+    public List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page, int pageSize) {
+        return favoriteRepository.getFavoriteByUserFetchForGetListProduct(userId, CommonUtil.getPageForNativeQueryIsFalse(page, pageSize))
                 .stream().map(value -> {
 //            FlashSaleProduct flashSaleProduct = flashSaleProductService.getProductFlashSaleInProgress(value.getProduct().getId());
 //

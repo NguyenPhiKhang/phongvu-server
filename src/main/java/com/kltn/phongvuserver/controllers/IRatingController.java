@@ -19,7 +19,8 @@ public interface IRatingController {
     @GetMapping("/rating/{productId}")
     ResponseEntity<RatingProductDTO> getRatingByProduct(@PathVariable("productId") int id,
                                                         @RequestParam(value = "select", defaultValue = "all") String select,
-                                                        @RequestParam(value = "p", defaultValue = "1") int page);
+                                                        @RequestParam(value = "p", defaultValue = "1") int page,
+                                                        @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @RequestMapping(value = "/user/{userId}/review-product", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<String> reviewProduct(@PathVariable("userId") int user_id, @ModelAttribute("input_review") InputReviewProductDTO input_review);

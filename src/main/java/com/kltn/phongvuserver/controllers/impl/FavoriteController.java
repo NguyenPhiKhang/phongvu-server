@@ -25,7 +25,7 @@ public class FavoriteController implements IFavoriteController {
     }
 
     @Override
-    public List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page) {
-        return favoriteProductService.getListFavoriteProductByUser(userId, page);
+    public List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page, int pageSize) {
+        return favoriteProductService.getListFavoriteProductByUser(userId, page, pageSize);
     }
 }

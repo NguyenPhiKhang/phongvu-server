@@ -12,5 +12,6 @@ public interface IFavoriteController {
     String createOrUpdateFavoriteOfUser(@PathVariable("userId") int userId, @PathVariable("productId") int productId);
 
     @GetMapping("/{userId}/get-favorite-products")
-    List<ProductItemDTO> getListFavoriteProductByUser(@PathVariable("userId") int userId, @RequestParam(value = "p", defaultValue = "1") int page);
+    List<ProductItemDTO> getListFavoriteProductByUser(@PathVariable("userId") int userId, @RequestParam(value = "p", defaultValue = "1") int page,
+                                                      @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 }

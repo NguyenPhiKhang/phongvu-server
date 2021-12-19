@@ -21,7 +21,8 @@ public interface IProductController {
             @PathVariable("idCategory") int idCategory,
             @RequestParam(value = "demand", defaultValue = "0") int demand,
             @RequestParam(value = "brand", defaultValue = "0") int brand,
-            @RequestParam(value = "p", defaultValue = "1") int page);
+            @RequestParam(value = "p", defaultValue = "1") int page,
+            @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
 
     @GetMapping("/product/{id}")
@@ -45,15 +46,19 @@ public interface IProductController {
     List<HashMap<String, Double>> calculationContentBasedTest(@RequestParam("s") String search);
 
     @GetMapping("/search-product")
-    List<SearchProductDTO> searchProduct(@RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page);
+    List<SearchProductDTO> searchProduct(@RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page,
+                                         @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
 
     @GetMapping("/{userId}/search-product")
-    List<SearchProductDTO> searchProduct(@PathVariable("userId") int userId, @RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page);
+    List<SearchProductDTO> searchProduct(@PathVariable("userId") int userId, @RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page,
+                                         @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
 
     @GetMapping("/product/{productId}/products-similarity")
-    List<ProductItemDTO> productsSimilarity(@PathVariable("productId") int productId, @RequestParam(value = "p", defaultValue = "1") int page);
+    List<ProductItemDTO> productsSimilarity(@PathVariable("productId") int productId, @RequestParam(value = "p", defaultValue = "1") int page,
+                                            @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
 
     @GetMapping("/user/{userId}/products-also-like")
-    List<ProductItemDTO> productsMightAlsoLike(@PathVariable int userId, @RequestParam(value = "p", defaultValue = "1") int page);
+    List<ProductItemDTO> productsMightAlsoLike(@PathVariable int userId, @RequestParam(value = "p", defaultValue = "1") int page,
+                                               @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
 
 }

@@ -16,6 +16,7 @@ import java.util.Set;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, ProductRepositoryCustom {
     boolean existsProductByIdAndVisibilityTrue(int id);
+
     Product findByIdAndVisibilityTrue(int id);
 
     @Query(value = "select count(*) from demand_product where demand_id=:demandId and product_id=:productId", nativeQuery = true)

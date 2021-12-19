@@ -31,7 +31,8 @@ public interface IHistorySearchController {
     ResponseEntity<Set<String>> getRecommendSearch(@RequestParam("keyword") String keyword);
 
     @GetMapping("/search/hot-search-item")
-    ResponseEntity<List<HotSearchDTO>> getHotSearchItem(@RequestParam(value = "p", defaultValue = "1") int page);
+    ResponseEntity<List<HotSearchDTO>> getHotSearchItem(@RequestParam(value = "p", defaultValue = "1") int page,
+                                                        @RequestParam(value = "p_size", defaultValue = "4") int pageSize);
 
     @GetMapping("/search/hot-search-text")
     ResponseEntity<List<String>> getHotSearchText();

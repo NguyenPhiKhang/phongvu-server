@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface IFavoriteService {
     void updateFavoriteOfUser(int userId, int productId);
-    List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page);
+    List<ProductItemDTO> getListFavoriteProductByUser(int userId, int page, int pageSize);
     boolean checkUserLikedProduct(int userId, int productId);
 }

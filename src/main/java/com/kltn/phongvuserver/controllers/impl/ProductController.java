@@ -58,8 +58,8 @@ public class ProductController implements IProductController {
     private EntityManager em;
 
     @Override
-    public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page) {
-        return productService.getProductsByCategory(idCategory, demand, brand, page);
+    public List<ProductItemDTO> getProductsByCategory(int idCategory, int demand, int brand, int page, int pageSize) {
+        return productService.getProductsByCategory(idCategory, demand, brand, page, pageSize);
     }
 
     @Override
@@ -191,24 +191,24 @@ public class ProductController implements IProductController {
     }
 
     @Override
-    public List<SearchProductDTO> searchProduct(String search, int page) {
-        return productService.getProductSearch(search, page);
+    public List<SearchProductDTO> searchProduct(String search, int page, int pageSize) {
+        return productService.getProductSearch(search, page, pageSize);
     }
 
     @Override
-    public List<SearchProductDTO> searchProduct(int userId, String search, int page) {
+    public List<SearchProductDTO> searchProduct(int userId, String search, int page, int pageSize) {
         historySearchService.createOrUpdateHistorySearch(userId, search);
-        return productService.getProductSearch(search, page);
+        return productService.getProductSearch(search, page, pageSize);
     }
 
     @Override
-    public List<ProductItemDTO> productsSimilarity(int productId, int page) {
-        return productService.getProductsSimilarity(productId, page);
+    public List<ProductItemDTO> productsSimilarity(int productId, int page, int pageSize) {
+        return productService.getProductsSimilarity(productId, page, pageSize);
     }
 
     @Override
-    public List<ProductItemDTO> productsMightAlsoLike(int userId, int page) {
-        return productService.getProductsAlsoLike(userId, page, "all");
+    public List<ProductItemDTO> productsMightAlsoLike(int userId, int page, int pageSize) {
+        return productService.getProductsAlsoLike(userId, page, pageSize, "all");
     }
 
     private void normalizedRating(List<Integer> list_product, List<RatingRSDTO> listRatingNormalized, List<AVGRatedProductDTO> listAVG) {

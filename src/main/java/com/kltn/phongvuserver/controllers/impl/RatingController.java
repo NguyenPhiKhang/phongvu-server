@@ -45,7 +45,7 @@ public class RatingController implements IRatingController {
     }
 
     @Override
-    public ResponseEntity<RatingProductDTO> getRatingByProduct(int id, String select, int page) {
+    public ResponseEntity<RatingProductDTO> getRatingByProduct(int id, String select, int page, int pageSize) {
         RatingProductDTO ratingProductDTO = new RatingProductDTO();
 
         RatingStar ratingStar = ratingStarService.getRatingStarByProductId(id);
@@ -66,12 +66,12 @@ public class RatingController implements IRatingController {
 
         List<Rating> ratings;
         if (select.equals("all"))
-            ratings = ratingService.getRatingsByProductId(id, CommonUtil.getPageForNativeQueryIsTrue(page, 20));
+            ratings = ratingService.getRatingsByProductId(id, CommonUtil.getPageForNativeQueryIsTrue(page, pageSize));
         else {
             if (!select.equals("image")) {
-                ratings = ratingService.getRatingByProductIdAndStar(id, Integer.parseInt(select), CommonUtil.getPageForNativeQueryIsTrue(page, 20));
+                ratings = ratingService.getRatingByProductIdAndStar(id, Integer.parseInt(select), CommonUtil.getPageForNativeQueryIsTrue(page, pageSize));
             } else {
-                ratings = ratingService.getRatingByProductIdHasImage(id, CommonUtil.getPageForNativeQueryIsTrue(page, 20));
+                ratings = ratingService.getRatingByProductIdHasImage(id, CommonUtil.getPageForNativeQueryIsTrue(page, pageSize));
             }
         }
 
