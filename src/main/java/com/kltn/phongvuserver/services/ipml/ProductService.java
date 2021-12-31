@@ -224,7 +224,7 @@ public class ProductService implements IProductService {
     @Override
     public List<ProductItemDTO> getProductsAlsoLike(int userId, int page, int pageSize, String sameFor) {
         List<Integer> listIdProduct = new ArrayList<>();
-        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(0, 10);
+        Pageable pageable = CommonUtil.getPageForNativeQueryIsFalse(1, 10);
         Page<Object[]> pageSeen = productRepository.getShortDescriptionOrNameByUser(userId, pageable);
         List<DescriptionCountDTO> listSeen = pageSeen.getContent().stream().map(v -> {
             listIdProduct.add((Integer) v[2]);
