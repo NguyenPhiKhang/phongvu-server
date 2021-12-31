@@ -47,18 +47,18 @@ public interface IProductController {
 
     @GetMapping("/search-product")
     List<SearchProductDTO> searchProduct(@RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page,
-                                         @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
+                                         @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @GetMapping("/{userId}/search-product")
     List<SearchProductDTO> searchProduct(@PathVariable("userId") int userId, @RequestParam("s") String search, @RequestParam(value = "p", defaultValue = "1") int page,
-                                         @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
+                                         @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @GetMapping("/product/{productId}/products-similarity")
     List<ProductItemDTO> productsSimilarity(@PathVariable("productId") int productId, @RequestParam(value = "p", defaultValue = "1") int page,
-                                            @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
+                                            @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @GetMapping("/user/{userId}/products-also-like")
     List<ProductItemDTO> productsMightAlsoLike(@PathVariable int userId, @RequestParam(value = "p", defaultValue = "1") int page,
-                                               @RequestParam(value = "p_size", defaultValue = "14") int pageSize);
+                                               @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
 }

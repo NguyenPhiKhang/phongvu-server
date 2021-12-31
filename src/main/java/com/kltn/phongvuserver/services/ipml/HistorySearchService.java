@@ -83,25 +83,28 @@ public class HistorySearchService implements IHistorySearchService {
 
     @Override
     public void autoHistorySearch() {
-        List<String> listNameCategories = categoryService.getAllNameCategories();
-        List<String> newWord = new ArrayList<>();
-        listNameCategories.forEach(c-> {
-            if(!(c.contains("thương hiệu")||  c.contains("nhu cầu"))){
-                newWord.addAll(Arrays.asList(c.split(" & ")));
-            }
-        });
+//        List<String> listNameCategories = categoryService.getAllNameCategories();
+//        List<String> newWord = new ArrayList<>();
+//        listNameCategories.forEach(c-> {
+//            if(!(c.contains("thương hiệu")||  c.contains("nhu cầu"))){
+//                newWord.addAll(Arrays.asList(c.split(" & ")));
+//            }
+//        });
+
+        List<String> listSearch = List.of("laptop dell","laptop asus","dong ho samsung","laptop gaming","laptop van phong","apple watch","samsung watch","macbook pro","macbook","macbook 2020","dell 7460","dell 16gb","dien thoai samsung","man hinh cong","man hinh lcd","tai nghe khong day","tai nghe co day","tai nghe bluetooth","airpod 3","tai nghe sony","man hinh 21 inch","máy tính bảng","dell 7700","asus 512gb","lap lenovo","laptop ssd","xiaomi note 4","xiaomi","iphone 7","iphone 7 plus","iphone x", "iphone chinh hang", "iphone 11 pro", "iphone 11 pro", "iphone 11 pro max", "ip X","ip 11","ip 12", "samsung galaxy","man hinh samsung","man hinh dell","man hinh 23.5","dell inspriron","xiaomi pad","dell alienware","logitech g333","dell vostro 3500","ipad pro","iphone 12","iphone 12 pro max","iphone 12 pro","sony srs-xb23","loa kéo","loa karaoke","sạc dự phòng","giá đỡ điện thoại","tai nghe gaming","cap lightning","apple watch","macbook air 2019","jbl bar studio","jbl charge 3","cáp sạc type c","acer aspire","oppo a37","loa bluetooth","soundmax","loa logitech","tai nghe on ear","samsung galaxy note");
+
         List<Integer> listIdUser = userService.getListIdUser();
 
         Random rd = new Random();
         int listUserSize = listIdUser.size();
-        int listNameCategoriesSize = newWord.size();
+        int listSearchSize = listSearch.size();
 
         for(int i = 0; i < listUserSize - 100; i++){
             int numSearch = 1 + rd.nextInt(12);
 
             for(int j = 0; j<numSearch; j++){
-                int idxSearch = rd.nextInt(listNameCategoriesSize);
-                createOrUpdateHistorySearch(listIdUser.get(i), newWord.get(idxSearch));
+                int idxSearch = rd.nextInt(listSearchSize);
+                createOrUpdateHistorySearch(listIdUser.get(i), listSearch.get(idxSearch));
             }
         }
     }

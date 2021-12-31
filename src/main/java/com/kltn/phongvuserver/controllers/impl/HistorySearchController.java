@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +50,13 @@ public class HistorySearchController implements IHistorySearchController {
 
     @Override
     public String autoHistorySearch() {
+        long startTime = new Date().getTime();
+
         historySearchService.autoHistorySearch();
+
+        long endTime = new Date().getTime();
+        long difference = endTime - startTime;
+        System.out.println("Elapsed time in milliseconds: " + difference);
         return "Done";
     }
 
