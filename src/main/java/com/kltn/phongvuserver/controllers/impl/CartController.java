@@ -3,10 +3,14 @@ package com.kltn.phongvuserver.controllers.impl;
 import com.kltn.phongvuserver.controllers.ICartController;
 import com.kltn.phongvuserver.services.ICartService;
 import com.kltn.phongvuserver.services.IImageDataService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,6 +32,17 @@ public class CartController implements ICartController {
     @Override
     public String removeProductInCart(int cartItemId) {
         return cartService.removeProductInCart(cartItemId);
+    }
+
+    @Override
+    public String removeProductsInCart(String listCartItem) {
+        if (!listCartItem.isBlank()) {
+            List<String> listCartItemsId = Arrays.asList(listCartItem.split(","));
+            listCartItemsId.stream().filter(StringUtils::isNumeric)
+                    .forEach(cartItem -> cartService.removeProductInCart(Integer.parseInt(cartItem)));
+        }
+
+        return "Xoá thành công!";
     }
 
     @Override
