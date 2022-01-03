@@ -83,7 +83,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
     @Query("select p from Product p where p.visibility = true and p.id <> :productId")
     List<Product> getProductAndShortDescriptionExceptProduct(@Param("productId") int productId);
 
-    @Query(value = "Select case when (p.description <> '' and p.description is not null) then p.short_description else p.name end as txt_description, s.count as count_seen, s.product_id as product_id from `phongvu_db`.`products` as p inner join `phongvu_db`.`seen_products` as s on p.id = s.product_id where s.user_id = :userId and CURRENT_TIMESTAMP - s.last_time < 7000000 order by s.last_time desc", nativeQuery = true)
+    @Query(value = "Select case when (p.description <> '' and p.description is not null and p.description not like '%đang cập nhật%' and p.description not like '%Mô tả sản phẩm sẽ được cập nhật trong thời gian sớm nhất%') " +
+            "then p.description else case when (p.short_description <> '' and p.short_description is not null) " +
+            "then p.short_description else " +
+            "p.name end end as txt_description, s.count as count_seen, s.product_id as product_id from `phongvu_db`.`products` as p inner join `phongvu_db`.`seen_products` as s on p.id = s.product_id where s.user_id = :userId and CURRENT_TIMESTAMP - s.last_time < 7000000 order by s.last_time desc", nativeQuery = true)
     Page<Object[]> getShortDescriptionOrNameByUser(@Param("userId") int userId, Pageable pageable);
 
     @Query("select p from Product p where p.visibility = true and p.id not in :listIdProduct")

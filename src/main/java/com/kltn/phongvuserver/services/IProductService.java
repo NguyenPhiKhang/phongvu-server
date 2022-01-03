@@ -16,7 +16,7 @@ public interface IProductService {
     List<Product> getAllProductVisibility();
     void reviewProduct(int userId, InputReviewProductDTO inputReview);
     List<Product> productTopRating(int page, int pageSize);
-    List<Product> productRecommendForUser(int userId);
+    List<Product> productRecommendForUser(int userId, int page, int pageSize);
     List<HashMap<String, Double>> calcContentBasedTest(String textTest);
     List<SearchProductDTO> getProductSearch(String search, int page, int pageSize);
     List<ProductItemDTO> getProductsSimilarity(int id, int page, int pageSize);

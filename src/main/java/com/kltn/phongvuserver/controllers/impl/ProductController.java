@@ -78,7 +78,7 @@ public class ProductController implements IProductController {
             if (!recommendRatingService.checkExistUser(userId)) {
                 recommend_product_for_user(userId);
             }
-            list = productService.productRecommendForUser(userId).stream().map(value -> productItemDTOMapper.mapRow(value)).collect(Collectors.toList());
+            list = productService.productRecommendForUser(userId, page, pageSize).stream().map(value -> productItemDTOMapper.mapRow(value)).collect(Collectors.toList());
         }
 
         long endTime = new Date().getTime();
@@ -165,7 +165,7 @@ public class ProductController implements IProductController {
             }
         });
 
-        mapPredictionProduct.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(10).forEach(value -> {
+        mapPredictionProduct.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(100).forEach(value -> {
             listProductRS.append(value.getKey()).append("-");
             listProductRS_Show.append(value.getKey()).append(" - ").append(value.getValue()).append(";");
         });

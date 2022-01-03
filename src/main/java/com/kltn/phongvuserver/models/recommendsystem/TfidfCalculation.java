@@ -3,8 +3,6 @@ package com.kltn.phongvuserver.models.recommendsystem;
 import com.google.common.base.Strings;
 import com.kltn.phongvuserver.models.Product;
 import com.kltn.phongvuserver.utils.VNCharacterUtil;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -91,32 +89,35 @@ public class TfidfCalculation {
     }
 
     public DocumentProperties calculateTF(String des, SortedSet<String> wordList) {
-        HashMap<String, Integer> wordCount = getTerms(des, wordList);
+        HashMap<String, Integer> wordCount = getTerms(des, wordList, "", 1);
         return getDocumentProperties(wordCount);
     }
 
     public DocumentProperties calculateTF(Product product, SortedSet<String> wordList, String sameFor) {
         DocumentProperties docProperty = new DocumentProperties();
+        int multiple = 1;
+        String nameOriginal = "";
         String docProduct = "";
         if (sameFor.equals("all")) {
-            if (product.getShortDescription() == null || product.getShortDescription().isEmpty())
-                docProduct = product.getName();
-            else docProduct = product.getShortDescription();
-        } else {
-            if (sameFor.equals("name"))
-                docProduct = product.getName();
-            else if (sameFor.equals("description")) {
-                docProduct = Jsoup.parse(product.getShortDescription()).body().text();
-            } else if (sameFor.equals("category")) {
-                docProduct = product.getCategory().getName();
-            } else if(sameFor.equals("name&desc")){
-                docProduct = Strings.repeat(product.getName() + " ", 10) + Jsoup.parse(product.getDescription()).body().text();
-            }else if(sameFor.equals("name&short")){
-                docProduct = Strings.repeat(product.getName() + " ", 10) + Jsoup.parse(product.getShortDescription()).body().text();
-            }
-
+            docProduct = getTextRecommend("name", product) + getTextRecommend("description", product) + getTextRecommend("short", product);
+        } else if (sameFor.equals("name")) {
+            docProduct = removeHangSapVeName(product.getName());
+        } else if (sameFor.equals("description")) {
+            docProduct = getTextRecommend("description", product);
+        } else if (sameFor.equals("category")) {
+            docProduct = product.getCategory().getName();
+        } else if(sameFor.equals("short_description")){
+            docProduct = getTextRecommend("short", product);
+        } else if (sameFor.equals("name&desc")) {
+            docProduct = removeHangSapVeName(product.getName()) + getTextRecommend("description", product);
+            nameOriginal = removeHangSapVeName(product.getName());
+            multiple = 10;
+        } else if (sameFor.equals("name&short")) {
+            docProduct = removeHangSapVeName(product.getName()) + getTextRecommend("short", product);
+            nameOriginal = removeHangSapVeName(product.getName());
+            multiple = 10;
         }
-        HashMap<String, Integer> wordCount = getTerms(docProduct, wordList);
+        HashMap<String, Integer> wordCount = getTerms(docProduct, wordList, nameOriginal, multiple);
         docProperty.setWordCountMap(wordCount);
         HashMap<String, Double> termFrequency = calculateTermFrequency(docProperty.getWordCountMap());
         docProperty.setTermFreqMap(termFrequency);
@@ -175,9 +176,9 @@ public class TfidfCalculation {
 
     //cleaning up the input by removing .,:"
     public String cleanseInput(String input) {
-        String newStr = input.replaceAll("[, . : ;\"]", "");
+        String newStr = input.replaceAll("[,.:;\"/]", " ");
         newStr = newStr.replaceAll("\\p{P}", "");
-        newStr = newStr.replaceAll("\t", "");
+//        newStr = newStr.replaceAll("\t", "");
         return newStr;
     }
 
@@ -186,14 +187,14 @@ public class TfidfCalculation {
         HashMap<String, Integer> finalMap = new HashMap<>();
 
         for (DescriptionCountDTO description : listDescription) {
-            String[] words = description.getDescOrName().toLowerCase().split(" ");
+            String[] words = removeTagHtml(removeHangSapVeName(description.getDescOrName())).toLowerCase().trim().split(" ");
             for (String term : words) {
                 //cleaning up the term ie removing .,:"
-                term = cleanseInput(term);
+//                term = cleanseInput(term);
                 //ignoring numbers
-                if (isDigit(term)) {
-                    continue;
-                }
+//                if (isDigit(term)) {
+//                    continue;
+//                }
                 if (term.length() == 0) {
                     continue;
                 }
@@ -213,27 +214,29 @@ public class TfidfCalculation {
         return finalMap;
     }
 
-    public HashMap<String, Integer> getTerms(String description, SortedSet<String> wordList) {
+    public HashMap<String, Integer> getTerms(String description, SortedSet<String> wordList, String nameOriginal, int multiple) {
         HashMap<String, Integer> WordCount = new HashMap<String, Integer>();
         HashMap<String, Integer> finalMap = new HashMap<>();
 
-        String[] words = description.toLowerCase().split(" ");
+        String[] words = removeTagHtml(description).toLowerCase().trim().split(" ");
+        String nameOriginalFormat = removeTagHtml(nameOriginal).toLowerCase().trim();
         for (String term : words) {
             //cleaning up the term ie removing .,:"
-            term = cleanseInput(term);
+//            term = cleanseInput(term);
             //ignoring numbers
-            if (isDigit(term)) {
-                continue;
-            }
+//            if (isDigit(term)) {
+//                continue;
+//            }
             if (term.length() == 0) {
                 continue;
             }
             String removeAccentTerm = VNCharacterUtil.removeAccent(term);
             wordList.add(removeAccentTerm);
+            int count = multiple > 1 && nameOriginalFormat.contains(term) ? multiple : 1;
             if (WordCount.containsKey(removeAccentTerm)) {
-                WordCount.put(removeAccentTerm, WordCount.get(removeAccentTerm) + 1);
+                WordCount.put(removeAccentTerm, WordCount.get(removeAccentTerm) + count);
             } else {
-                WordCount.put(removeAccentTerm, 1);
+                WordCount.put(removeAccentTerm, count);
             }
         }
 
@@ -241,5 +244,38 @@ public class TfidfCalculation {
         finalMap = new HashMap<String, Integer>(treeMap);
 
         return finalMap;
+    }
+
+    public String removeTagHtml(String input) {
+        String str = cleanseInput(input);
+        str = str.replaceAll("<.*?>", "");
+        str = str.replaceAll("[-()]", " ");
+        str = str.replaceAll("(&nbsp)", " ");
+        str = str.replaceAll("\\s{2,}", " ");
+        return str;
+    }
+
+    public String removeHangSapVeName(String input) {
+        return input.toLowerCase().replaceAll("(hàng sắp về)|(hàng trưng bày)", "");
+    }
+
+    public String getTextRecommend(String root, Product product){
+        String docProduct = "";
+        if(root.equals("description")){
+            docProduct = product.getDescription();
+            if (docProduct == null || docProduct.isBlank() || docProduct.isEmpty() || docProduct.toLowerCase().contains("đang cập nhật") || docProduct.toLowerCase().contains("mô tả sản phẩm sẽ được cập nhật trong thời gian sớm nhất")) {
+                docProduct = product.getShortDescription();
+                if (docProduct == null || docProduct.isBlank() || docProduct.isEmpty()) {
+                    docProduct = removeHangSapVeName(product.getName());
+                }
+            }
+        }else if(root.equals("short")){
+            docProduct = product.getShortDescription();
+            if (docProduct == null || docProduct.isBlank() || docProduct.isEmpty()) {
+                docProduct = removeHangSapVeName(product.getName());
+            }
+        }else docProduct  = removeHangSapVeName(product.getName());
+
+        return docProduct;
     }
 }

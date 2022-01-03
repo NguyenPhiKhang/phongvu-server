@@ -160,10 +160,19 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<Product> productRecommendForUser(int userId) {
+    public List<Product> productRecommendForUser(int userId, int page, int pageSize) {
         RecommendRating recommendRating = recommendRatingService.findRecommendRatingByUserId(userId);
-        List<Integer> listProducts = Arrays.stream(recommendRating.getProducts().split("-")).map(Integer::parseInt).collect(Collectors.toList());
-        return productRepository.findProductByListIdProduct(listProducts);
+        int start = (page - 1) * pageSize;
+        int end = start + pageSize;
+        List<Integer> listProducts = Arrays.stream(getSliceOfArray(recommendRating.getProducts().split("-"), start, end)).map(Integer::parseInt).collect(Collectors.toList());
+        List<Product> products = productRepository.findProductByListIdProduct(listProducts);
+        List<Product> productsReturn = new ArrayList<>();
+
+        listProducts.forEach(l -> {
+            products.stream().filter(p -> p.getId() == l).findFirst().ifPresent(productsReturn::add);
+        });
+
+        return productsReturn;
     }
 
     @Override
@@ -197,8 +206,8 @@ public class ProductService implements IProductService {
 
         System.out.println(page);
 
-        return RecommendSystemUtil.calcCosineSimilarityText(search, list, "name&short").entrySet().stream().sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip((long) page * pageSize)
+        return RecommendSystemUtil.calcCosineSimilarityText(search, list, "name").entrySet().stream().sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
+                .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
                 .map(entry -> searchProductDTOMapper.mapRow(entry))
                 .collect(Collectors.toList());
@@ -215,7 +224,7 @@ public class ProductService implements IProductService {
 
         return RecommendSystemUtil.calcCosineSimilarityText(categoryName, listProduct, "category").entrySet().stream()
                 .sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip((long) page * pageSize)
+                .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
                 .map(v -> productItemDTOMapper.mapRow(v.getKey()))
                 .collect(Collectors.toList());
@@ -284,7 +293,7 @@ public class ProductService implements IProductService {
 
         return listProductAlsoLike.entrySet().stream()
                 .sorted(Map.Entry.<Product, Double>comparingByValue().reversed())
-                .skip((long) page * pageSize)
+                .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
                 .map(v -> productItemDTOMapper.mapRow(v.getKey()))
                 .collect(Collectors.toList());
@@ -304,5 +313,21 @@ public class ProductService implements IProductService {
 
         rating.addAllDataImages(imageDataService.storesImageData(multipartFiles));
         ratingRepository.save(rating);
+    }
+
+    private String[] getSliceOfArray(String[] arr,
+                                     int start, int end) {
+
+        // Get the slice of the Array
+        int size = Math.min(end, arr.length) - start;
+        String[] slice = new String[Math.max(size, 0)];
+
+        // Copy elements of arr to slice
+        for (int i = 0; i < slice.length; i++) {
+            slice[i] = arr[start + i];
+        }
+
+        // return the slice
+        return slice;
     }
 }
