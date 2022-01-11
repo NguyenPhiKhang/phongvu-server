@@ -13,6 +13,7 @@ import java.util.List;
 @RequestMapping("/default")
 @CrossOrigin(value = {"http://localhost:3000", "https://adminfashion-shop.azurewebsites.net"})
 public interface IRatingController {
+
     @PostMapping("/rating/auto-rating")
     ResponseEntity<String> autoRating();
 
@@ -29,7 +30,7 @@ public interface IRatingController {
     List<CardMyRatingDTO> getMyRatings(@PathVariable("userId") int userId,
                                        @RequestParam(value = "star", defaultValue = "0") int star,
                                        @RequestParam(value = "p", defaultValue = "1") int page,
-                                       @RequestParam(value = "p_size", defaultValue = "10") int pageSize);
+                                       @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @GetMapping("/user/{userId}/count-star-my-ratings")
     CountRatingProductDTO countStarRatingByUser(@PathVariable int userId);

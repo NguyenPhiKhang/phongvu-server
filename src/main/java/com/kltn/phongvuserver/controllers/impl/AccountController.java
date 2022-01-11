@@ -64,7 +64,7 @@ public class AccountController implements IAccountController {
             accountService.updatePassword(userId, input.getNewPassword());
             return ResponseEntity.ok().body(new ResponseMessage<>("Thay đổi mật khẩu thành công!", 1));
         } else {
-            return ResponseEntity.ok().body(new ResponseMessage<>("Mật khẩu không đúng!", -1));
+            return ResponseEntity.status(404).body(new ResponseMessage<>("Mật khẩu không đúng!", -1));
         }
     }
 }

@@ -31,7 +31,7 @@ public interface IProductController {
     @GetMapping("/recommend/top-rating/{userId}")
     ResponseEntity<List<ProductItemDTO>> getProductTopRating(@PathVariable("userId") int userId,
                                                              @RequestParam(value = "p", defaultValue = "1") int page,
-                                                             @RequestParam(value = "p_size", defaultValue = "10") int pageSize);
+                                                             @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @PostMapping("/recommend/create-cosine-similarity")
     ResponseEntity<String> createCosineSimilarity();

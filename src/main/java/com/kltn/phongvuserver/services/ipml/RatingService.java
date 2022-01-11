@@ -36,6 +36,43 @@ public class RatingService implements IRatingService {
     private RatingStarRepository ratingStarRepository;
 
     @Override
+    public void autoRatingV3() {
+        List<Product> products = productRepository.findAll();
+        products.forEach(p->{
+            int star1 = ratingRepository.countStarInRating(p.getId(),1);
+            int star2 = ratingRepository.countStarInRating(p.getId(),2);
+            int star3 = ratingRepository.countStarInRating(p.getId(),3);
+            int star4 = ratingRepository.countStarInRating(p.getId(),4);
+            int star5 = ratingRepository.countStarInRating(p.getId(),5);
+            RatingStar rs = p.getRatingStar();
+            if(rs.getStar1()+rs.getStar2()+rs.getStar3()+rs.getStar4()+rs.getStar5()!=star1+star2+star3+star4+star5){
+                rs.setStar1(star1);
+                rs.setStar2(star2);
+                rs.setStar3(star3);
+                rs.setStar4(star4);
+                rs.setStar5(star5);
+                ratingStarRepository.save(rs);
+            }
+        });
+    }
+
+    @Override
+    public void autoRatingV2() {
+        List<Product> products = productRepository.findProductsByRatingStarIsNull();
+        products.forEach(p -> {
+            RatingStar ratingStar = new RatingStar();
+            ratingStar.setStar1(0);
+            ratingStar.setStar2(0);
+            ratingStar.setStar3(0);
+            ratingStar.setStar4(0);
+            ratingStar.setStar5(0);
+            RatingStar rs = ratingStarRepository.save(ratingStar);
+            p.setRatingStar(rs);
+            productRepository.save(p);
+        });
+    }
+
+    @Override
     public void autoRating() {
         Random rd = new Random();
         List<User> users = userRepository.findAll();

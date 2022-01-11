@@ -40,7 +40,9 @@ public class RatingController implements IRatingController {
 
     @Override
     public ResponseEntity<String> autoRating() {
-        ratingService.autoRating();
+//        ratingService.autoRating();
+//        ratingService.autoRatingV2();
+        ratingService.autoRatingV3();
         return ResponseEntity.ok().body("done");
     }
 

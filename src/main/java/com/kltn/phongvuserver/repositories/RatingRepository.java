@@ -16,6 +16,9 @@ import java.util.List;
 public interface RatingRepository extends JpaRepository<Rating, Integer>, QuerydslPredicateExecutor<Rating> {
     boolean existsByUserIdAndProductId(int user_id, int product_id);
 
+    @Query(value = "select count(*) as col_0_0_ from ratings where product_id=:pId and star =:star", nativeQuery = true)
+    int countStarInRating(@Param("pId") int pId, @Param("star")int star);
+
     @Query(value = "select count(*) as col_0_0_ from ratings where user_id=:uId", nativeQuery = true)
     int existsByUserId(@Param("uId") int userId);
 
@@ -37,7 +40,7 @@ public interface RatingRepository extends JpaRepository<Rating, Integer>, Queryd
     @Query(value = "SELECT * FROM ratings where product_id=:productId order by time_updated desc limit :p,20;", nativeQuery = true)
     List<Rating> findRatingsByProductId(@Param("productId") int productId, @Param("p") int page);
 
-    @Query(value = "SELECT * FROM ratings where product_id=:productId and star=:star order by time_updated desc limit :p,10;", nativeQuery = true)
+    @Query(value = "SELECT * FROM ratings where product_id=:productId and star=:star order by time_updated desc limit :p,20;", nativeQuery = true)
     List<Rating> findRatingsByProductIdAndStar(@Param("productId") int productId, @Param("star") int star, @Param("p") int page);
 
     @Query(value = "select r.*\n" +

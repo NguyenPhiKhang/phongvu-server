@@ -8,6 +8,8 @@ import com.kltn.phongvuserver.models.recommendsystem.RatingRSDTO;
 import java.util.List;
 
 public interface IRatingService {
+    void autoRatingV3();
+    void autoRatingV2();
     void autoRating();
     boolean checkExistId(int id);
     List<Rating> getAll();

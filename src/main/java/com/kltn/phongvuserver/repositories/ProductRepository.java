@@ -17,6 +17,8 @@ import java.util.Set;
 public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, ProductRepositoryCustom {
     boolean existsProductByIdAndVisibilityTrue(int id);
 
+    List<Product> findProductsByRatingStarIsNull();
+
     Product findByIdAndVisibilityTrue(int id);
 
     @Query(value = "select count(*) from demand_product where demand_id=:demandId and product_id=:productId", nativeQuery = true)
@@ -56,7 +58,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
             "join fetch p.category " +
             "left join fetch p.dataImages " +
             "left join fetch p.brand " +
-            "join fetch p.ratingStar " +
+            "left join fetch p.ratingStar " +
             "left join fetch p.productAttributes pa join fetch pa.attribute " +
             "where p.id = :id and p.visibility=true")
     Product findProductDetailById(@Param("id") int id);

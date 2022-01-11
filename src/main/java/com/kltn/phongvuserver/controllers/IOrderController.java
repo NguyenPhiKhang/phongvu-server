@@ -15,7 +15,7 @@ public interface IOrderController {
     HistoryOrderDTO getListOrderByStatus(@PathVariable("userId") int userId,
                                          @RequestParam(value = "stt", defaultValue = "0") int status,
                                          @RequestParam(value = "p", defaultValue = "1") int page,
-                                         @RequestParam(value = "p_size", defaultValue = "10") int pageSize);
+                                         @RequestParam(value = "p_size", defaultValue = "20") int pageSize);
 
     @PutMapping("/order/{orderId}/update-status")
     String updateStatusOfOrder(@PathVariable("orderId") int orderId, @RequestParam("stt") int status);
